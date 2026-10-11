@@ -21,7 +21,22 @@ with vector-only RAG, and every relationship's quoted evidence is checked progra
 
 ## Status
 
-Early stage: the repository currently holds the project description only.
+Early stage. Done so far: the company universe ([config/universe.yaml](config/universe.yaml)), a
+rate-limited EDGAR client, and a coverage check of how densely these companies' filings mention each
+other ([docs/coverage.md](docs/coverage.md)).
+
+## Setup
+
+Requires [uv](https://docs.astral.sh/uv/). Everything RippleKG uses is free: SEC EDGAR, open-source
+models run locally, and free price data.
+
+```bash
+uv sync
+cp .env.example .env        # set SEC_USER_AGENT to "RippleKG research <your email>" (SEC requirement)
+make test                   # unit tests, no network
+uv run ripplekg universe-check   # validate company CIKs against EDGAR
+uv run ripplekg coverage         # co-mention density report -> docs/coverage.md
+```
 
 ## Author
 
