@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: software
+title: "RippleKG: Tracing Supply-Chain Shocks Through a Temporal Knowledge Graph"
+authors:
+  - family-names: Khurd
+    given-names: Eshwari
+repository-code: "https://github.com/eshwarikhurd/ripplekg"
+license: Apache-2.0
+keywords:
+  - knowledge graph
+  - graph RAG
+  - supply chain
+  - FalkorDB
+  - event study

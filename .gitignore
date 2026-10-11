@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+
+# Local data: downloaded filings, price data, extracted triples, graph dumps, results
+data/
+results/
+*.dump
