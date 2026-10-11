@@ -1,0 +1,103 @@
+# RippleKG company universe: EV-battery and critical-minerals supply chain.
+#
+# Filers (cik set) are downloaded and can be scored in the evaluation if they have
+# US-listed shares. Non-filers (no cik) never have filings of their own, but appear
+# as graph nodes when a filer's documents mention them.
+#
+# search_names are exact phrases for EDGAR full-text search. Avoid bare words that
+# also have ordinary meanings (for example "Ford", "Vale", "Lucid").
+#
+# tiers: miner_refiner | diversified_miner | materials_components | cells_storage | recycler | automaker
+# CIKs come from SEC's company_tickers.json or, for delisted companies, from EDGAR
+# full-text search display names. `ripplekg universe check` re-validates them.
+
+companies:
+  # Miners and refiners
+  - {id: ALB, name: Albemarle, tier: miner_refiner, cik: 915913, ticker: ALB, search_names: ["Albemarle"]}
+  - {id: SQM, name: Sociedad Química y Minera (SQM), tier: miner_refiner, cik: 909037, ticker: SQM, search_names: ["SQM"]}
+  - {id: LAC, name: Lithium Americas, tier: miner_refiner, cik: 1966983, ticker: LAC, search_names: ["Lithium Americas"]}
+  - {id: LAR, name: Lithium Argentina, tier: miner_refiner, cik: 1440972, ticker: LAR, search_names: ["Lithium Argentina"],
+     notes: "Former Lithium Americas Corp. before the October 2023 split; keeps the pre-split filing history."}
+  - {id: PLL, name: Piedmont Lithium, tier: miner_refiner, cik: 1728205, ticker: PLL, listed_until: "2025",
+     search_names: ["Piedmont Lithium"], successor: ELVR}
+  - {id: ELVR, name: Elevra Lithium (formerly Sayona Mining), tier: miner_refiner, cik: 1739016, ticker: ELVR,
+     search_names: ["Elevra Lithium", "Sayona Mining", "Sayona Quebec"]}
+  - {id: SGML, name: Sigma Lithium, tier: miner_refiner, cik: 1848309, ticker: SGML, search_names: ["Sigma Lithium"]}
+  - {id: SLI, name: Standard Lithium, tier: miner_refiner, cik: 1537137, ticker: SLI, search_names: ["Standard Lithium"]}
+  - {id: LTHM, name: Livent, tier: miner_refiner, cik: 1742924, ticker: LTHM, listed_until: "2024",
+     search_names: ["Livent"], successor: ALTM}
+  - {id: ALTM, name: Arcadium Lithium, tier: miner_refiner, cik: 1977303, ticker: ALTM, listed_until: "2025",
+     search_names: ["Arcadium Lithium"], successor: RIO}
+  - {id: IONR, name: ioneer, tier: miner_refiner, cik: 1896084, ticker: IONR, search_names: ["ioneer"]}
+  - {id: ATLX, name: Atlas Lithium, tier: miner_refiner, cik: 1540684, ticker: ATLX, search_names: ["Atlas Lithium"]}
+  - {id: MP, name: MP Materials, tier: miner_refiner, cik: 1801368, ticker: MP, search_names: ["MP Materials"]}
+  - {id: UUUU, name: Energy Fuels, tier: miner_refiner, cik: 1385849, ticker: UUUU, search_names: ["Energy Fuels"]}
+  - {id: WWR, name: Westwater Resources, tier: miner_refiner, cik: 839470, ticker: WWR, search_names: ["Westwater Resources"]}
+
+  # Diversified miners (nickel, copper, cobalt, lithium exposure)
+  - {id: FCX, name: Freeport-McMoRan, tier: diversified_miner, cik: 831259, ticker: FCX, search_names: ["Freeport-McMoRan"]}
+  - {id: RIO, name: Rio Tinto, tier: diversified_miner, cik: 863064, ticker: RIO, search_names: ["Rio Tinto"]}
+  - {id: BHP, name: BHP, tier: diversified_miner, cik: 811809, ticker: BHP, search_names: ["BHP"]}
+  - {id: VALE, name: Vale, tier: diversified_miner, cik: 917851, ticker: VALE, search_names: ["Vale S.A.", "Vale Base Metals"]}
+
+  # Materials and components
+  - {id: NVX, name: NOVONIX, tier: materials_components, cik: 1859795, ticker: NVX, search_names: ["NOVONIX"]}
+  - {id: PKX, name: POSCO Holdings, tier: materials_components, cik: 889132, ticker: PKX,
+     search_names: ["POSCO Future M", "POSCO Chemical", "POSCO Holdings"]}
+
+  # Cells and storage
+  - {id: QS, name: QuantumScape, tier: cells_storage, cik: 1811414, ticker: QS, search_names: ["QuantumScape"]}
+  - {id: SLDP, name: Solid Power, tier: cells_storage, cik: 1844862, ticker: SLDP, search_names: ["Solid Power"]}
+  - {id: ENVX, name: Enovix, tier: cells_storage, cik: 1828318, ticker: ENVX, search_names: ["Enovix"]}
+  - {id: AMPX, name: Amprius Technologies, tier: cells_storage, cik: 1899287, ticker: AMPX, search_names: ["Amprius"]}
+  - {id: MVST, name: Microvast, tier: cells_storage, cik: 1760689, ticker: MVST, search_names: ["Microvast"]}
+  - {id: ENS, name: EnerSys, tier: cells_storage, cik: 1289308, ticker: ENS, search_names: ["EnerSys"]}
+  - {id: FLNC, name: Fluence Energy, tier: cells_storage, cik: 1868941, ticker: FLNC, search_names: ["Fluence Energy"]}
+  - {id: EOSE, name: Eos Energy Enterprises, tier: cells_storage, cik: 1805077, ticker: EOSE, search_names: ["Eos Energy"]}
+  - {id: GWH, name: ESS Tech, tier: cells_storage, cik: 1819438, ticker: GWH, search_names: ["ESS Tech"]}
+  - {id: TE, name: T1 Energy (formerly FREYR Battery), tier: cells_storage, cik: 1992243, ticker: TE,
+     search_names: ["T1 Energy", "FREYR Battery"]}
+  - {id: DFLI, name: Dragonfly Energy, tier: cells_storage, cik: 1847986, ticker: DFLI, search_names: ["Dragonfly Energy"]}
+
+  # Recyclers
+  - {id: LICY, name: Li-Cycle, tier: recycler, cik: 1828811, ticker: LICY, listed_until: "2025", search_names: ["Li-Cycle"]}
+  - {id: ABAT, name: American Battery Technology, tier: recycler, cik: 1576873, ticker: ABAT,
+     search_names: ["American Battery Technology"]}
+
+  # Automakers
+  - {id: TSLA, name: Tesla, tier: automaker, cik: 1318605, ticker: TSLA, search_names: ["Tesla"]}
+  - {id: GM, name: General Motors, tier: automaker, cik: 1467858, ticker: GM, search_names: ["General Motors"]}
+  - {id: F, name: Ford Motor, tier: automaker, cik: 37996, ticker: F, search_names: ["Ford Motor"]}
+  - {id: RIVN, name: Rivian, tier: automaker, cik: 1874178, ticker: RIVN, search_names: ["Rivian"]}
+  - {id: LCID, name: Lucid Group, tier: automaker, cik: 1811210, ticker: LCID, search_names: ["Lucid Group", "Lucid Motors"]}
+  - {id: STLA, name: Stellantis, tier: automaker, cik: 1605484, ticker: STLA, search_names: ["Stellantis", "Fiat Chrysler"]}
+  - {id: TM, name: Toyota, tier: automaker, cik: 1094517, ticker: TM, search_names: ["Toyota"]}
+  - {id: HMC, name: Honda, tier: automaker, cik: 715153, ticker: HMC, search_names: ["Honda Motor"]}
+  - {id: NIO, name: NIO, tier: automaker, cik: 1736541, ticker: NIO, search_names: ["NIO Inc"]}
+  - {id: XPEV, name: XPeng, tier: automaker, cik: 1810997, ticker: XPEV, search_names: ["XPeng"]}
+  - {id: LI, name: Li Auto, tier: automaker, cik: 1791706, ticker: LI, search_names: ["Li Auto"]}
+  - {id: PSNY, name: Polestar, tier: automaker, cik: 1884082, ticker: PSNY, search_names: ["Polestar"]}
+
+  # Non-filers: graph nodes only
+  - {id: CATL, name: CATL, tier: cells_storage, search_names: ["Contemporary Amperex", "CATL"]}
+  - {id: LGES, name: LG Energy Solution, tier: cells_storage, search_names: ["LG Energy Solution"]}
+  - {id: LGCHEM, name: LG Chem, tier: materials_components, search_names: ["LG Chem"]}
+  - {id: PANASONIC, name: Panasonic, tier: cells_storage, search_names: ["Panasonic"]}
+  - {id: SKON, name: SK On, tier: cells_storage, search_names: ["SK On", "SK Innovation"]}
+  - {id: SDI, name: Samsung SDI, tier: cells_storage, search_names: ["Samsung SDI"]}
+  - {id: BYD, name: BYD, tier: automaker, search_names: ["BYD"]}
+  - {id: GANFENG, name: Ganfeng Lithium, tier: miner_refiner, search_names: ["Ganfeng"]}
+  - {id: TIANQI, name: Tianqi Lithium, tier: miner_refiner, search_names: ["Tianqi"]}
+  - {id: UMICORE, name: Umicore, tier: materials_components, search_names: ["Umicore"]}
+  - {id: ECOPRO, name: EcoPro, tier: materials_components, search_names: ["EcoPro"]}
+  - {id: HUAYOU, name: Zhejiang Huayou Cobalt, tier: materials_components, search_names: ["Huayou"]}
+  - {id: GLENCORE, name: Glencore, tier: diversified_miner, search_names: ["Glencore"]}
+  - {id: NORTHVOLT, name: Northvolt, tier: cells_storage, search_names: ["Northvolt"]}
+  - {id: REDWOOD, name: Redwood Materials, tier: recycler, search_names: ["Redwood Materials"]}
+  - {id: ASCEND, name: Ascend Elements, tier: recycler, search_names: ["Ascend Elements"]}
+  - {id: ULTIUM, name: Ultium Cells (GM–LGES JV), tier: cells_storage, search_names: ["Ultium Cells"]}
+  - {id: BLUEOVALSK, name: BlueOval SK (Ford–SK On JV), tier: cells_storage, search_names: ["BlueOval SK"]}
+  - {id: VW, name: Volkswagen, tier: automaker, search_names: ["Volkswagen"]}
+  - {id: HYUNDAI, name: Hyundai Motor, tier: automaker, search_names: ["Hyundai Motor"]}
+  - {id: BMW, name: BMW, tier: automaker, search_names: ["BMW"]}
+  - {id: MERCEDES, name: Mercedes-Benz, tier: automaker, search_names: ["Mercedes-Benz", "Daimler"]}
