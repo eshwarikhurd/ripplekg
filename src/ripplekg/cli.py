@@ -1,0 +1,94 @@
+"""Command-line entry point: `ripplekg <command>`."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+
+from ripplekg import settings
+from ripplekg.edgar.client import EdgarClient
+from ripplekg.universe import load_universe
+
+
+def _client() -> EdgarClient:
+    return EdgarClient(settings.sec_user_agent(), cache_dir=settings.HTTP_CACHE_DIR)
+
+
+def cmd_universe_check(args: argparse.Namespace) -> int:
+    from ripplekg.coverage import check_filers
+
+    universe = load_universe()
+    filers = check_filers(_client(), universe, args.start, args.end)
+    out = settings.RESULTS_DIR / "coverage" / "filers.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    filers.to_csv(out, index=False)
+    cols = ["id", "cik", "sec_name", "sec_tickers", "annual_form", "n_annual", "first_annual", "last_annual"]
+    print(filers[cols].to_string(index=False))
+    missing = filers.loc[filers["n_annual"] == 0, "id"].tolist()
+    print(f"\n{len(filers)} filers checked; no annual report in window: {', '.join(missing) or 'none'}")
+    print(f"wrote {out.relative_to(settings.ROOT)}")
+    return 0
+
+
+def cmd_coverage(args: argparse.Namespace) -> int:
+    from ripplekg import coverage
+
+    universe = load_universe()
+    client = _client()
+    out_dir = settings.RESULTS_DIR / "coverage"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    print("checking filers…", flush=True)
+    filers = coverage.check_filers(client, universe, args.start, args.end)
+    print("counting co-mentions…", flush=True)
+    mentions = coverage.co_mentions(
+        client, universe, args.start, args.end, progress=lambda m: print(m, flush=True)
+    )
+    print("counting supply phrases…", flush=True)
+    phrases = coverage.phrase_counts(client, universe, args.start, args.end)
+
+    pairs = coverage.pair_table(mentions)
+    summary = coverage.summarise(universe, filers, pairs)
+    for name, df in [("filers", filers), ("mentions", mentions), ("pairs", pairs), ("phrases", phrases)]:
+        df.to_csv(out_dir / f"{name}.csv", index=False)
+    report = settings.DOCS_DIR / "coverage.md"
+    coverage.write_report(report, universe, filers, pairs, phrases, summary, args.start, args.end)
+
+    print(
+        f"\n{'GO' if summary.go else 'NO-GO'}: {summary.n_scored} scorable companies "
+        f"(need {coverage.GO_MIN_SCORED}), {summary.n_undirected_pairs} co-mentioned pairs "
+        f"(need {coverage.GO_MIN_PAIRS}); {client.network_calls} network requests"
+    )
+    print(f"wrote {report.relative_to(settings.ROOT)} and {out_dir.relative_to(settings.ROOT)}/*.csv")
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    def window(p: argparse.ArgumentParser) -> None:
+        p.add_argument("--start", default=settings.CORPUS_START, help="first filing date (YYYY-MM-DD)")
+        p.add_argument("--end", default=settings.CORPUS_END, help="last filing date (YYYY-MM-DD)")
+
+    p = sub.add_parser("universe-check", help="validate universe CIKs against EDGAR and count filings")
+    window(p)
+    p.set_defaults(func=cmd_universe_check)
+
+    p = sub.add_parser("coverage", help="week-1 go/no-go: co-mention density via EDGAR full-text search")
+    window(p)
+    p.set_defaults(func=cmd_coverage)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        return args.func(args)
+    except settings.SettingsError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
