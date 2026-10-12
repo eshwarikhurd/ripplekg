@@ -1,0 +1,362 @@
+# RippleKG benchmark events. Frozen with docs/protocol.md; later changes go in the
+# protocol's "Deviations" section, never silently.
+#
+# Fields
+#   origin      where the shock starts. A bare id is a company in universe.yaml;
+#               other nodes use kind:id (material:, region:, authority:, program:).
+#   shock_type  supply_shock (propagates downstream) | demand_shock (upstream) | mixed (both)
+#   sign        expected direction for the origin: negative | positive | mixed
+#   announced   date the information first became public (local date of the first credible report)
+#   timing      before_open | during_market | after_close | non_trading_day | unknown (US Eastern)
+#   day0        first US trading day the market could react (protocol section 3)
+#   named       universe companies named in the primary source; excluded from scoring for this event
+#   split       dev | test for primary events (pre-registered, see events.assign_split); none for macro
+#
+# Every date was checked against the listed sources; SEC filings are cited where the origin is a filer.
+
+events:
+  # ---------------------------------------------------------------- company origins
+  - id: gm-bolt-recall-2021
+    title: GM expands Chevrolet Bolt recall to all Bolts over LG battery cell defects
+    bucket: primary
+    origin: [GM]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2021-08-20
+    timing: after_close
+    day0: 2021-08-23
+    named: [GM, LGCHEM]
+    sources:
+      - https://www.nbcnews.com/news/us-news/gm-recalls-all-chevrolet-bolt-electric-cars-over-fire-risk-n1277356
+      - https://www.industryweek.com/technology-and-iiot/article/21173031/gm-expands-chevrolet-bolt-ev-recall-adding-1-billion-in-costs
+    notes: GM announced after Friday's close; LG Chem fell about 10% in Seoul on Monday.
+    split: test
+
+  - id: ford-lightning-battery-fire-2023
+    title: Ford halts F-150 Lightning production after an SK On battery fire
+    bucket: primary
+    origin: [F]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2023-02-14
+    timing: unknown
+    day0: 2023-02-14
+    named: [F, SKON]
+    sources:
+      - https://www.koreajoongangdaily.com/business/ford-halts-production-of-f-150-evs-after-sk-on-battery-fire/10885233
+      - https://foxbusiness.com/lifestyle/ford-battery-fire-caused-lightning-production-stoppage
+    notes: The fire was on 2023-02-04 but was not public until Ford's 2023-02-14 statement.
+    split: test
+
+  - id: tesla-berlin-red-sea-2024
+    title: Tesla suspends Giga Berlin production as Red Sea attacks delay components
+    bucket: primary
+    origin: [TSLA]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2024-01-11
+    timing: unknown
+    day0: 2024-01-11
+    named: [TSLA]
+    sources:
+      - https://maritime-executive.com/article/red-sea-disruption-forces-tesla-to-suspend-production-in-germany
+    split: test
+
+  - id: tesla-berlin-arson-2024
+    title: Arson on a power pylon halts production at Tesla Giga Berlin
+    bucket: primary
+    origin: [TSLA]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2024-03-05
+    timing: before_open
+    day0: 2024-03-05
+    named: [TSLA]
+    sources:
+      - https://www.businesslive.co.za/bd/companies/2024-03-05-suspected-arson-attack-halts-production-at-tesla-factory/
+    split: test
+
+  - id: rivian-parts-shortage-2024
+    title: Rivian cuts 2024 production guidance over a shared-component shortage
+    bucket: primary
+    origin: [RIVN]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2024-10-04
+    timing: during_market
+    day0: 2024-10-04
+    named: [RIVN]
+    sources:
+      - https://www.sec.gov/Archives/edgar/data/1874178/000187417824000059/
+      - https://www.supplychaindive.com/news/rivian-cuts-production-outlook-parts-shortage/729089/
+    split: dev
+
+  - id: licycle-ccaa-2025
+    title: Li-Cycle obtains CCAA and Chapter 15 creditor protection with a Glencore stalking-horse bid
+    bucket: primary
+    origin: [LICY]
+    shock_type: mixed
+    sign: negative
+    announced: 2025-05-14
+    timing: unknown
+    day0: 2025-05-14
+    named: [LICY, GLENCORE]
+    sources:
+      - https://www.sec.gov/Archives/edgar/data/1828811/000119312525122542/d892872dex991.htm
+      - https://www.businesswire.com/news/home/20250514681645/en
+    split: test
+
+  - id: ford-three-row-ev-cancel-2024
+    title: Ford cancels its three-row electric SUV and books an impairment
+    bucket: primary
+    origin: [F]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2024-08-21
+    timing: unknown
+    day0: 2024-08-21
+    named: [F]
+    sources:
+      - https://www.sec.gov/Archives/edgar/data/37996/000003799624000150/
+    split: dev
+
+  - id: northvolt-chapter11-2024
+    title: Northvolt files for Chapter 11 reorganisation
+    bucket: primary
+    origin: [NORTHVOLT]
+    shock_type: mixed
+    sign: negative
+    announced: 2024-11-21
+    timing: before_open
+    day0: 2024-11-21
+    named: [NORTHVOLT]
+    sources:
+      - https://mercomindia.com/battery-manufacturer-northvolt-files-for-bankruptcy-protection-in-the-us
+    split: dev
+
+  - id: mp-dod-partnership-2025
+    title: MP Materials announces a Department of Defense partnership with a rare-earth price floor
+    bucket: primary
+    origin: [MP]
+    shock_type: mixed
+    sign: positive
+    announced: 2025-07-10
+    timing: before_open
+    day0: 2025-07-10
+    named: [MP]
+    sources:
+      - https://www.sec.gov/Archives/edgar/data/1801368/000119312525157310/
+    split: test
+
+  - id: catl-jianxiawo-halt-2025
+    title: CATL suspends its Jianxiawo lepidolite mine after its licence lapses
+    bucket: primary
+    origin: [CATL, "material:lithium"]
+    shock_type: supply_shock
+    sign: mixed
+    announced: 2025-08-10
+    timing: non_trading_day
+    day0: 2025-08-11
+    named: [CATL]
+    sources:
+      - https://cnevpost.com/2025/08/10/catl-suspends-lithium-mine-production-3-months/
+      - https://projectblue.com/blue/news-analysis/1283/catl-halts-lithium-mineral-production-at-jianxiawo-lepidolite-mine
+    notes: Reported Sunday 2025-08-10, confirmed by CATL on 2025-08-11; Guangzhou lithium futures hit limit-up.
+    split: dev
+
+  - id: hyundai-lges-georgia-raid-2025
+    title: Immigration raid halts construction of the Hyundai–LG Energy Solution battery plant in Georgia
+    bucket: primary
+    origin: [HYUNDAI, LGES]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2025-09-04
+    timing: during_market
+    day0: 2025-09-04
+    named: [HYUNDAI, LGES]
+    sources:
+      - https://en.wikipedia.org/wiki/2025_Georgia_Hyundai_plant_immigration_raid
+      - https://www.bisnow.com/national/news/economy/immigration-raid-at-4b-manufacturing-site-nets-450-arrests-halts-construction-130837
+    split: test
+
+  - id: lac-government-stake-2025
+    title: Reports that the US government seeks an equity stake in Lithium Americas
+    bucket: primary
+    origin: [LAC]
+    shock_type: mixed
+    sign: positive
+    announced: 2025-09-23
+    timing: after_close
+    day0: 2025-09-24
+    named: [LAC, GM]
+    sources:
+      - https://www.mining.com/?p=1188911
+      - https://www.sec.gov/Archives/edgar/data/1966983/000119312525225972/
+    notes: Reuters report after Tuesday's close; LAC rose about 95% on day 0. The 2025-10-01 8-K confirms the final deal.
+    split: test
+
+  - id: gm-ev-charge-2025
+    title: GM books a $1.6 billion charge as it cuts EV capacity
+    bucket: primary
+    origin: [GM]
+    shock_type: demand_shock
+    sign: negative
+    announced: 2025-10-14
+    timing: unknown
+    day0: 2025-10-14
+    named: [GM]
+    sources:
+      - https://www.sec.gov/Archives/edgar/data/1467858/000146785825000136/
+    split: dev
+
+  # ---------------------------------------------------------------- material, region and policy origins
+  - id: zimbabwe-lithium-ore-ban-2022
+    title: Zimbabwe bans exports of unprocessed lithium ore
+    bucket: primary
+    origin: ["region:ZW", "material:spodumene"]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2022-12-20
+    timing: unknown
+    day0: 2022-12-20
+    named: []
+    sources:
+      - https://www.bloomberg.com/news/articles/2022-12-20/zimbabwe-bans-raw-lithium-exports-with-immediate-effect
+      - https://www.iea.org/policies/28974-export-control-on-lithium-ore-in-zimbabwe
+    split: test
+
+  - id: chile-national-lithium-strategy-2023
+    title: Chile announces a national lithium strategy with state majority control
+    bucket: primary
+    origin: ["region:CL", "material:lithium"]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2023-04-20
+    timing: after_close
+    day0: 2023-04-21
+    named: [SQM, ALB]
+    sources:
+      - https://www.cnbc.com/2023/04/21/chile-plans-to-nationalize-its-vast-lithium-industry.html
+      - https://www.globalxetfs.com/articles/chile-lithium-update-borics-plans-fall-short-of-nationalization
+    notes: Evening address on 2023-04-20. SQM and Albemarle (Chile's two operators) are excluded as named.
+    split: test
+
+  - id: china-graphite-controls-2023
+    title: China imposes export licences on high-grade graphite
+    bucket: primary
+    origin: ["material:graphite", "authority:CN-MOFCOM"]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2023-10-20
+    timing: before_open
+    day0: 2023-10-20
+    named: []
+    sources:
+      - https://www.jdsupra.com/legalnews/china-updates-its-export-curbs-on-4471773
+      - https://www.iea.org/policies/17933
+    split: dev
+
+  - id: drc-cobalt-export-suspension-2025
+    title: DR Congo suspends cobalt exports for four months
+    bucket: primary
+    origin: ["region:CD", "material:cobalt"]
+    shock_type: supply_shock
+    sign: mixed
+    announced: 2025-02-22
+    timing: non_trading_day
+    day0: 2025-02-24
+    named: []
+    sources:
+      - https://www.bloomberg.com/news/articles/2025-02-24/congo-suspends-cobalt-exports-for-four-months-amid-oversupply
+      - https://www.mining.com/web/congo-suspends-cobalt-exports-for-four-months-amid-oversupply/
+    split: test
+
+  - id: us-china-ev-tariffs-2024
+    title: US to raise Section 301 tariffs on Chinese EVs, batteries and critical minerals
+    bucket: primary
+    origin: ["authority:US-USTR", "region:CN"]
+    shock_type: mixed
+    sign: mixed
+    announced: 2024-05-10
+    timing: unknown
+    day0: 2024-05-10
+    named: []
+    sources:
+      - https://electrek.co/2024/05/10/biden-rumored-to-announce-quadrupling-of-tariffs-on-chinese-evs-up-to-100/
+      - https://www.globalsecurity.org/wmd/library/news/china/2024/05/china-240514-voa01.htm
+    notes: First credible report (WSJ) on 2024-05-10; formal announcement 2024-05-14, inside the [0, +3] window.
+    split: test
+
+  - id: ira-manchin-deal-2022
+    title: Manchin–Schumer deal revives the Inflation Reduction Act and its EV credits
+    bucket: primary
+    origin: ["program:US-IRA"]
+    shock_type: mixed
+    sign: positive
+    announced: 2022-07-27
+    timing: after_close
+    day0: 2022-07-28
+    named: []
+    sources:
+      - https://www.benzinga.com/news/small-cap/22/07/28254627/why-chargepoint-blink-and-evgo-shares-are-soaring-today
+      - https://www.fool.com/investing/2022/07/28/why-tesla-nikola-and-lordstown-motors-stocks-are-r/
+    split: test
+
+  - id: feoc-guidance-2023
+    title: Treasury and DOE propose foreign-entity-of-concern rules for the EV tax credit
+    bucket: primary
+    origin: ["program:US-IRA-30D", "region:CN"]
+    shock_type: mixed
+    sign: mixed
+    announced: 2023-12-01
+    timing: unknown
+    day0: 2023-12-01
+    named: []
+    sources:
+      - https://www.manufacturingdive.com/news/ira-guidance-foreign-entity-of-concern-automakers-evs-batteries-china/701344/
+    split: test
+
+  # ---------------------------------------------------------------- macro bucket (reported separately)
+  - id: suez-ever-given-2021
+    title: Ever Given blocks the Suez Canal
+    bucket: macro
+    origin: ["region:suez-canal"]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2021-03-23
+    timing: before_open
+    day0: 2021-03-23
+    named: []
+    sources:
+      - https://porteconomicsmanagement.org/suez-canal-blockage-2021/
+    notes: Market-wide logistics shock; affects most companies, so it is not used for the primary metrics.
+
+  - id: shanghai-lockdown-2022
+    title: Shanghai announces a two-phase citywide lockdown
+    bucket: macro
+    origin: ["region:CN-shanghai"]
+    shock_type: supply_shock
+    sign: negative
+    announced: 2022-03-27
+    timing: non_trading_day
+    day0: 2022-03-28
+    named: []
+    sources:
+      - https://hongkongfp.com/2022/03/28/half-of-shanghai-in-lockdown-to-curb-covid-19-outbreak/
+    notes: Announced late Sunday 2022-03-27 Shanghai time.
+
+  - id: china-rare-earth-controls-2025
+    title: China adds seven medium and heavy rare earths to its export-control list
+    bucket: macro
+    origin: ["material:rare-earths", "authority:CN-MOFCOM"]
+    shock_type: supply_shock
+    sign: mixed
+    announced: 2025-04-04
+    timing: before_open
+    day0: 2025-04-04
+    named: []
+    sources:
+      - https://www.miningweekly.com/article/chinas-export-controls-see-april-rare-earth-shipments-tumble-on-month-2025-05-09
+    notes: >-
+      Coincides with the April 2025 US tariff sell-off, which dominates returns in the window,
+      so it is in the macro bucket rather than the primary set.
