@@ -194,5 +194,18 @@ already know earlier outcomes.
 
 ## 11. Deviations
 
-None yet. Each entry: date, what changed, why, and whether it was decided before or after seeing any
-test-event result.
+Each entry: date, what changed, why, and whether it was decided before or after seeing any test-event
+result.
+
+**D1 (2026-10-12): which LLM.** Section 6 said "the local LLM". The LLM is now chosen by an extraction
+comparison on the hand-labelled gold set: Claude Haiku 5.5 (Anthropic API) against a local Ollama model
+(Qwen 7–8B). The more accurate one is used, or Ollama if they are close. Whichever wins is used by
+**every** LLM-based method (RippleKG extraction, vector RAG and zero-shot), and its name and knowledge
+cut-off are recorded with the results. Reason: a local 7–8B model on the available 16 GB machine was
+the main risk to extraction quality and run time. Decided **before** any price data was downloaded and
+before any test-event result existed.
+
+**D2 (2026-10-12): staged corpus.** The graph is first built from annual reports only (10-K, 20-F,
+40-F: 10,431 pre-filtered chunks covering 45 companies). 10-Q and 8-K filings are added only if the dev
+events show the graph is too sparse; that decision is made on dev events alone, and the corpus used for
+the test run is fixed before it. Reason: cost and run time. Decided **before** any result.
