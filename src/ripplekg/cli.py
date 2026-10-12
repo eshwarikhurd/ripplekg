@@ -112,6 +112,88 @@ def cmd_index(args: argparse.Namespace) -> int:
     return 0
 
 
+def _selected_filings(limit: int | None):
+    import pandas as pd
+
+    df = pd.read_parquet(settings.DATA_DIR / "index" / "filings.parquet")
+    df = df[df["selected"]].sort_values(["filing_date", "accession"])
+    return df.head(limit) if limit else df
+
+
+def cmd_fetch(args: argparse.Namespace) -> int:
+    from ripplekg.ingest.edgar import fetch_filings
+
+    selected = _selected_filings(args.limit)
+    manifest = fetch_filings(
+        _client(),
+        selected,
+        settings.DATA_DIR / "raw",
+        settings.DATA_DIR / "raw" / "manifest.parquet",
+        progress=lambda m: print(m, flush=True),
+    )
+    mb = manifest["bytes"].sum() / 1e6
+    print(
+        f"\n{manifest['accession'].nunique()} filings, {len(manifest)} files, "
+        f"{mb:,.0f} MB raw (stored gzipped)"
+    )
+    return 0
+
+
+def cmd_parse(args: argparse.Namespace) -> int:
+    from ripplekg.documents import DocumentStore
+    from ripplekg.ingest.edgar import load_manifest, source_hash, to_document
+
+    raw_dir = settings.DATA_DIR / "raw"
+    manifest = load_manifest(raw_dir / "manifest.parquet")
+    store = DocumentStore(settings.DATA_DIR / "documents")
+    files = {acc: g.to_dict("records") for acc, g in manifest.groupby("accession")}
+    built = skipped = empty = 0
+    for filing in _selected_filings(args.limit).to_dict("records"):
+        rows = files.get(filing["accession"])
+        if not rows:
+            continue
+        existing = store.read(filing["company_id"], f"edgar:{filing['accession']}")
+        if existing is not None and existing.source_sha256 == source_hash(rows) and not args.force:
+            skipped += 1
+            continue
+        doc = to_document(filing, rows, raw_dir)
+        store.write(doc)
+        built += 1
+        empty += doc.n_chars == 0
+        if built % 100 == 0:
+            print(f"parsed {built}", flush=True)
+    print(f"\n{built} documents built, {skipped} unchanged, {empty} with no text")
+    return 0
+
+
+def cmd_chunk(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from ripplekg.chunk_report import write_report
+    from ripplekg.chunking import chunk_documents
+    from ripplekg.documents import DocumentStore
+    from ripplekg.ontology import load_ontology
+    from ripplekg.prefilter import Prefilter
+
+    chunks, occurrences, stats = chunk_documents(DocumentStore(settings.DATA_DIR / "documents"))
+    pf = Prefilter.from_ontology(load_ontology())
+    df = pd.DataFrame([c.__dict__ for c in chunks])
+    df["n_chars"] = df["text"].str.len()
+    df["families"] = [pf.families(c.text, c.company_id) for c in chunks]
+    df["mentions"] = [pf.other_companies(c.text, c.company_id) for c in chunks]
+
+    out = settings.DATA_DIR / "chunks"
+    out.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out / "chunks.parquet", index=False)
+    pd.DataFrame(occurrences).to_parquet(out / "occurrences.parquet", index=False)
+    cost = write_report(settings.DOCS_DIR / "chunks.md", df, stats)
+    n_sel = int((df["families"].map(len) > 0).sum())
+    print(f"{len(df):,} chunks, {n_sel:,} pass the pre-filter, {cost.calls:,} LLM calls")
+    print(f"estimated Haiku cost: ${cost.standard_usd:.2f} standard, ${cost.batch_usd:.2f} batch")
+    print("wrote data/chunks/*.parquet and docs/chunks.md")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -137,6 +219,18 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("index", help="index the universe's filings and select the extraction corpus")
     window(p)
     p.set_defaults(func=cmd_index)
+
+    p = sub.add_parser("fetch", help="download selected filings (resumable; skips files already on disk)")
+    p.add_argument("--limit", type=int, help="only the first N selected filings, by date")
+    p.set_defaults(func=cmd_fetch)
+
+    p = sub.add_parser("parse", help="raw filings -> Documents with relationship-bearing sections")
+    p.add_argument("--limit", type=int, help="only the first N selected filings, by date")
+    p.add_argument("--force", action="store_true", help="rebuild documents even if unchanged")
+    p.set_defaults(func=cmd_parse)
+
+    p = sub.add_parser("chunk", help="deduplicate, chunk and pre-filter documents; estimate LLM cost")
+    p.set_defaults(func=cmd_chunk)
     return parser
 
 
