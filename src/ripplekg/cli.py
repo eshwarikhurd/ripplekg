@@ -194,6 +194,31 @@ def cmd_chunk(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pilot(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from ripplekg.extraction_run import ANNUAL_FORMS, run_extraction, sample_chunks, write_pilot_report
+    from ripplekg.llm import ClaudeProvider, ResponseCache
+    from ripplekg.ontology import load_ontology
+
+    chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
+    stage = chunks[chunks["form"].isin(ANNUAL_FORMS) & (chunks["families"].map(len) > 0)]
+    sample = sample_chunks(stage, args.sample, args.seed)
+    provider = ClaudeProvider(model=args.model, effort=args.effort)
+    cache = ResponseCache(settings.DATA_DIR / "extractions" / "cache")
+    res = run_extraction(
+        sample, provider, cache, load_ontology(), load_universe(), progress=lambda m: print(m, flush=True)
+    )
+    out = settings.RESULTS_DIR / "pilot"
+    out.mkdir(parents=True, exist_ok=True)
+    res.outcomes.to_parquet(out / "outcomes.parquet", index=False)
+    res.edges.to_parquet(out / "edges.parquet", index=False)
+    full_calls = int(stage["families"].map(len).sum())
+    print(write_pilot_report(out / "pilot.md", res, len(sample), full_calls, args.model))
+    print(f"\nfull report: {(out / 'pilot.md').relative_to(settings.ROOT)}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -231,6 +256,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("chunk", help="deduplicate, chunk and pre-filter documents; estimate LLM cost")
     p.set_defaults(func=cmd_chunk)
+
+    p = sub.add_parser(
+        "pilot", help="extract a small sample of annual-report chunks and report cost and quality"
+    )
+    p.add_argument("--sample", type=int, default=50, help="number of chunks")
+    p.add_argument("--seed", type=int, default=7)
+    p.add_argument("--model", default="claude-haiku-5-5")
+    p.add_argument("--effort", default="low", choices=["low", "medium", "high"])
+    p.set_defaults(func=cmd_pilot)
     return parser
 
 
