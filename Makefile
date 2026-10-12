@@ -1,4 +1,4 @@
-.PHONY: setup test lint format universe coverage
+.PHONY: setup test lint format universe coverage events
 
 setup:
 	uv sync
@@ -19,3 +19,6 @@ universe:
 
 coverage:
 	uv run ripplekg coverage
+
+events:
+	uv run ripplekg events-check
