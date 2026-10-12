@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date, datetime, time
+from zoneinfo import ZoneInfo
 
 from ripplekg.edgar.client import EdgarClient
+
+EASTERN = ZoneInfo("America/New_York")
+MARKET_OPEN = time(9, 30)
 
 TICKER_MAP_URL = "https://www.sec.gov/files/company_tickers.json"
 SUBMISSIONS_URL = "https://data.sec.gov/submissions/{name}"
@@ -22,12 +27,35 @@ class Filing:
     report_date: str
     primary_document: str
     items: str
+    accepted: str = ""  # EDGAR acceptanceDateTime; the JSON value is genuine UTC
+    description: str = ""
 
     @property
     def url(self) -> str:
         return ARCHIVE_URL.format(
             cik=self.cik, accession=self.accession.replace("-", ""), document=self.primary_document
         )
+
+    @property
+    def accepted_utc(self) -> datetime | None:
+        if not self.accepted:
+            return None
+        return datetime.fromisoformat(self.accepted.replace("Z", "+00:00"))
+
+    @property
+    def accepted_et(self) -> datetime | None:
+        utc = self.accepted_utc
+        return utc.astimezone(EASTERN) if utc else None
+
+    def public_before_open(self, day: date) -> bool:
+        """True if EDGAR accepted the filing before 09:30 ET on `day` (the protocol's information cut-off).
+
+        Without an acceptance time, fall back to the filing date: public only if filed before `day`.
+        """
+        et = self.accepted_et
+        if et is None:
+            return date.fromisoformat(self.filing_date) < day
+        return et < datetime.combine(day, MARKET_OPEN, tzinfo=EASTERN)
 
 
 def load_ticker_map(client: EdgarClient) -> dict[str, tuple[int, str]]:
@@ -38,7 +66,11 @@ def load_ticker_map(client: EdgarClient) -> dict[str, tuple[int, str]]:
 
 def _rows(block: dict, cik: int) -> list[Filing]:
     n = len(block["accessionNumber"])
-    items = block.get("items") or [""] * n
+
+    def col(name: str) -> list:
+        return block.get(name) or [""] * n
+
+    items, accepted, descriptions = col("items"), col("acceptanceDateTime"), col("primaryDocDescription")
     return [
         Filing(
             cik=cik,
@@ -48,6 +80,8 @@ def _rows(block: dict, cik: int) -> list[Filing]:
             report_date=block["reportDate"][i] or "",
             primary_document=block["primaryDocument"][i],
             items=items[i] or "",
+            accepted=accepted[i] or "",
+            description=descriptions[i] or "",
         )
         for i in range(n)
     ]
