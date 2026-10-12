@@ -3,9 +3,10 @@ import json
 import pandas as pd
 from fakes import FakeResponse, FakeSession
 
-from ripplekg.documents import DocSection, Document, DocumentStore
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.ingest.edgar import exhibit_names, fetch_filings, load_manifest, to_document
+from ripplekg.download.client import EdgarClient
+from ripplekg.download.fetch import exhibit_names, fetch_filings, load_manifest
+from ripplekg.ingestion.documents import DocSection, Document, DocumentStore
+from ripplekg.ingestion.edgar_adapter import to_document
 
 BASE = "https://www.sec.gov/Archives/edgar/data/1/000000000124000001"
 FILLER = "We describe our operations at length. " * 10

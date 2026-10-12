@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ripplekg.ontology import NODE_FILES, PRIORS, Example, Ontology
+from ripplekg.ontology.schema import NODE_FILES, PRIORS, Example, Ontology
 
 FAMILY_TITLES = {
     "trade": "A. Trade links",

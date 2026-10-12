@@ -2,8 +2,8 @@ from datetime import date
 
 import pytest
 
-from ripplekg.events import DEV_COUNTS, EventsError, assign_split, load_events, parse_events
-from ripplekg.universe import load_universe
+from ripplekg.evaluation.events import DEV_COUNTS, EventsError, assign_split, load_events, parse_events
+from ripplekg.ontology.universe import load_universe
 
 UNIVERSE = load_universe()
 
@@ -87,7 +87,7 @@ def test_duplicate_ids_rejected():
 
 
 def test_weekdays_between():
-    from ripplekg.events import weekdays_between
+    from ripplekg.evaluation.events import weekdays_between
 
     fri, mon = date(2023, 10, 20), date(2023, 10, 23)
     assert weekdays_between(fri, mon) == 1

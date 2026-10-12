@@ -20,10 +20,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.edgar.fulltext import count_hits
-from ripplekg.edgar.index import ANNUAL_FORMS, company_submissions, list_filings
-from ripplekg.universe import Universe
+from ripplekg.download.client import EdgarClient
+from ripplekg.download.fulltext import count_hits
+from ripplekg.download.index import ANNUAL_FORMS, company_submissions, list_filings
+from ripplekg.ontology.universe import Universe
 
 SEARCH_FORMS = ["10-K", "10-Q", "8-K", "20-F", "40-F", "6-K"]
 

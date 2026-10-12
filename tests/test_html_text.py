@@ -1,4 +1,4 @@
-from ripplekg.parse.html_text import html_to_text
+from ripplekg.ingestion.html_text import html_to_text
 
 PAGE = """<?xml version="1.0" encoding="utf-8"?>
 <html xmlns:ix="http://www.xbrl.org/2013/inlineXBRL"><head><title>10-K</title><style>p{}</style></head>

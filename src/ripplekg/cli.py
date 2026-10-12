@@ -6,8 +6,8 @@ import argparse
 import sys
 
 from ripplekg import settings
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.universe import load_universe
+from ripplekg.download.client import EdgarClient
+from ripplekg.ontology.universe import load_universe
 
 
 def _client() -> EdgarClient:
@@ -15,7 +15,7 @@ def _client() -> EdgarClient:
 
 
 def cmd_universe_check(args: argparse.Namespace) -> int:
-    from ripplekg.coverage import check_filers
+    from ripplekg.download.coverage import check_filers
 
     universe = load_universe()
     filers = check_filers(_client(), universe, args.start, args.end)
@@ -31,7 +31,7 @@ def cmd_universe_check(args: argparse.Namespace) -> int:
 
 
 def cmd_coverage(args: argparse.Namespace) -> int:
-    from ripplekg import coverage
+    from ripplekg.download import coverage
 
     universe = load_universe()
     client = _client()
@@ -64,7 +64,7 @@ def cmd_coverage(args: argparse.Namespace) -> int:
 
 
 def cmd_events_check(args: argparse.Namespace) -> int:
-    from ripplekg.events import assign_split, load_events
+    from ripplekg.evaluation.events import assign_split, load_events
 
     events = load_events()
     expected = assign_split(events)
@@ -80,8 +80,8 @@ def cmd_events_check(args: argparse.Namespace) -> int:
 
 
 def cmd_ontology_doc(args: argparse.Namespace) -> int:
-    from ripplekg.ontology import example_errors, load_examples, load_ontology
-    from ripplekg.ontology_doc import render
+    from ripplekg.ontology.doc import render
+    from ripplekg.ontology.schema import example_errors, load_examples, load_ontology
 
     ont, examples = load_ontology(), load_examples()
     errors = example_errors(ont, examples)
@@ -97,7 +97,7 @@ def cmd_ontology_doc(args: argparse.Namespace) -> int:
 
 
 def cmd_index(args: argparse.Namespace) -> int:
-    from ripplekg import corpus
+    from ripplekg.download import corpus
 
     df = corpus.build_index(
         _client(), load_universe(), args.start, args.end, progress=lambda m: print(m, flush=True)
@@ -121,7 +121,7 @@ def _selected_filings(limit: int | None):
 
 
 def cmd_fetch(args: argparse.Namespace) -> int:
-    from ripplekg.ingest.edgar import fetch_filings
+    from ripplekg.download.fetch import fetch_filings
 
     selected = _selected_filings(args.limit)
     manifest = fetch_filings(
@@ -140,8 +140,9 @@ def cmd_fetch(args: argparse.Namespace) -> int:
 
 
 def cmd_parse(args: argparse.Namespace) -> int:
-    from ripplekg.documents import DocumentStore
-    from ripplekg.ingest.edgar import load_manifest, source_hash, to_document
+    from ripplekg.download.fetch import load_manifest
+    from ripplekg.ingestion.documents import DocumentStore
+    from ripplekg.ingestion.edgar_adapter import source_hash, to_document
 
     raw_dir = settings.DATA_DIR / "raw"
     manifest = load_manifest(raw_dir / "manifest.parquet")
@@ -169,11 +170,11 @@ def cmd_parse(args: argparse.Namespace) -> int:
 def cmd_chunk(args: argparse.Namespace) -> int:
     import pandas as pd
 
-    from ripplekg.chunk_report import write_report
-    from ripplekg.chunking import chunk_documents
-    from ripplekg.documents import DocumentStore
-    from ripplekg.ontology import load_ontology
-    from ripplekg.prefilter import Prefilter
+    from ripplekg.ingestion.chunk_report import write_report
+    from ripplekg.ingestion.chunking import chunk_documents
+    from ripplekg.ingestion.documents import DocumentStore
+    from ripplekg.ingestion.prefilter import Prefilter
+    from ripplekg.ontology.schema import load_ontology
 
     chunks, occurrences, stats = chunk_documents(DocumentStore(settings.DATA_DIR / "documents"))
     pf = Prefilter.from_ontology(load_ontology())
@@ -197,9 +198,9 @@ def cmd_chunk(args: argparse.Namespace) -> int:
 def cmd_pilot(args: argparse.Namespace) -> int:
     import pandas as pd
 
-    from ripplekg.extraction_run import ANNUAL_FORMS, run_extraction, sample_chunks, write_pilot_report
-    from ripplekg.llm import ClaudeProvider, OllamaProvider, ResponseCache
-    from ripplekg.ontology import load_ontology
+    from ripplekg.extraction.llm import ClaudeProvider, OllamaProvider, ResponseCache
+    from ripplekg.extraction.runner import ANNUAL_FORMS, run_extraction, sample_chunks, write_pilot_report
+    from ripplekg.ontology.schema import load_ontology
 
     chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
     stage = chunks[chunks["form"].isin(ANNUAL_FORMS) & (chunks["families"].map(len) > 0)]
@@ -234,7 +235,7 @@ def cmd_pilot(args: argparse.Namespace) -> int:
 def cmd_gold(args: argparse.Namespace) -> int:
     import pandas as pd
 
-    from ripplekg import gold
+    from ripplekg.extraction import gold
 
     folder = settings.RESULTS_DIR / "gold"
     if args.action == "sheet":
@@ -257,10 +258,10 @@ STAGES = {"annual": {"10-K", "20-F", "40-F"}, "10-q": {"10-Q"}, "8-k": {"8-K"}}
 def cmd_extract(args: argparse.Namespace) -> int:
     import pandas as pd
 
-    from ripplekg import batch
-    from ripplekg.extraction_run import run_extraction
-    from ripplekg.llm import ClaudeProvider, ResponseCache
-    from ripplekg.ontology import load_ontology
+    from ripplekg.extraction import batch
+    from ripplekg.extraction.llm import ClaudeProvider, ResponseCache
+    from ripplekg.extraction.runner import run_extraction
+    from ripplekg.ontology.schema import load_ontology
 
     chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
     stage = chunks[chunks["form"].isin(STAGES[args.stage]) & (chunks["families"].map(len) > 0)]

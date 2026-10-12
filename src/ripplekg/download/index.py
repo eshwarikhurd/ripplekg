@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from zoneinfo import ZoneInfo
 
-from ripplekg.edgar.client import EdgarClient
+from ripplekg.download.client import EdgarClient
 
 EASTERN = ZoneInfo("America/New_York")
 MARKET_OPEN = time(9, 30)

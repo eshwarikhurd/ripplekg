@@ -1,6 +1,6 @@
 import pytest
 
-from ripplekg.universe import UniverseError, load_universe, parse_universe
+from ripplekg.ontology.universe import UniverseError, load_universe, parse_universe
 
 
 def row(**kw):

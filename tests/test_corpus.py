@@ -3,8 +3,8 @@ from datetime import date
 import pandas as pd
 import pytest
 
-from ripplekg.corpus import selection, summary_table
-from ripplekg.edgar.index import Filing
+from ripplekg.download.corpus import selection, summary_table
+from ripplekg.download.index import Filing
 
 
 def filing(form="10-K", items="", accepted="", filing_date="2024-03-05"):

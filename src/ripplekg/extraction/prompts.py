@@ -10,8 +10,8 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 
-from ripplekg.llm import LLMProvider, LLMResult, ResponseCache, cached_complete
-from ripplekg.ontology import Example, Ontology
+from ripplekg.extraction.llm import LLMProvider, LLMResult, ResponseCache, cached_complete
+from ripplekg.ontology.schema import Example, Ontology
 
 PROMPT_VERSION = "v1"
 MAX_QUOTE_WORDS = 40

@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from ripplekg.ontology import Ontology, normalize_name
+from ripplekg.ontology.schema import Ontology, normalize_name
 
 _TRANSLATE = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"', "–": "-", "—": "-"})
 _WS = re.compile(r"\s+")

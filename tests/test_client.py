@@ -1,7 +1,7 @@
 import pytest
 from fakes import FakeClock, FakeResponse, FakeSession, json_response
 
-from ripplekg.edgar.client import EdgarClient, EdgarError, RateLimiter
+from ripplekg.download.client import EdgarClient, EdgarError, RateLimiter
 
 URL = "https://data.sec.gov/x.json"
 

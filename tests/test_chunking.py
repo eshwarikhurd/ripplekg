@@ -1,7 +1,7 @@
-from ripplekg.chunking import TARGET_CHARS, chunk_documents, line_hash
-from ripplekg.documents import DocSection, Document
-from ripplekg.ontology import load_ontology
-from ripplekg.prefilter import Prefilter
+from ripplekg.ingestion.chunking import TARGET_CHARS, chunk_documents, line_hash
+from ripplekg.ingestion.documents import DocSection, Document
+from ripplekg.ingestion.prefilter import Prefilter
+from ripplekg.ontology.schema import load_ontology
 
 LONG = "We purchase battery cells from Panasonic under a supply agreement that runs through 2026."
 RISK = "Our business depends on the availability of lithium, nickel and cobalt at reasonable prices."

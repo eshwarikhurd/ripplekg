@@ -1,7 +1,7 @@
 from fakes import FakeSession, json_response
 
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.edgar.index import Filing, list_filings, load_ticker_map
+from ripplekg.download.client import EdgarClient
+from ripplekg.download.index import Filing, list_filings, load_ticker_map
 
 
 def block(rows):

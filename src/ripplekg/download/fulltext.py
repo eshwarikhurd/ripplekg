@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ripplekg.edgar.client import EdgarClient
+from ripplekg.download.client import EdgarClient
 
 FTS_URL = "https://efts.sec.gov/LATEST/search-index"
 

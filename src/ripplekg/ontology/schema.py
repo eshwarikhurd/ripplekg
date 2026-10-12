@@ -14,8 +14,8 @@ from pathlib import Path
 
 import yaml
 
+from ripplekg.ontology.universe import Universe, load_universe
 from ripplekg.settings import CONFIG_DIR
-from ripplekg.universe import Universe, load_universe
 
 NODE_FILES = {
     "material": "materials.yaml",

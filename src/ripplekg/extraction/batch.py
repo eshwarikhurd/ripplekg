@@ -16,10 +16,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.extraction import build_prompt, user_message
-from ripplekg.llm import ClaudeProvider, ResponseCache, cache_key, result_from_message
-from ripplekg.ontology import Ontology, load_examples
-from ripplekg.universe import Universe
+from ripplekg.extraction.llm import ClaudeProvider, ResponseCache, cache_key, result_from_message
+from ripplekg.extraction.prompts import build_prompt, user_message
+from ripplekg.ontology.schema import Ontology, load_examples
+from ripplekg.ontology.universe import Universe
 
 BATCH_SIZE = 4_000  # keeps each batch far below the 256 MB request limit
 MAX_TOKENS = 4096

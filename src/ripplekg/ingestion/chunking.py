@@ -16,7 +16,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
-from ripplekg.documents import Document
+from ripplekg.ingestion.documents import Document
 
 TARGET_CHARS = 3000
 MIN_DEDUP_CHARS = 40  # shorter lines (headings, labels) are context, not content

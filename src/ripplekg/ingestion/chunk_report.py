@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.chunking import ChunkStats
+from ripplekg.ingestion.chunking import ChunkStats
 
 # Claude Haiku 5.5, USD per million tokens (prompts under 100K tokens), as of 2026-10.
 HAIKU_INPUT_PER_M = 0.10

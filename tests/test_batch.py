@@ -3,10 +3,10 @@ from types import SimpleNamespace
 
 import pandas as pd
 
-from ripplekg import batch
-from ripplekg.llm import ClaudeProvider, ResponseCache
-from ripplekg.ontology import load_ontology
-from ripplekg.universe import load_universe
+from ripplekg.extraction import batch
+from ripplekg.extraction.llm import ClaudeProvider, ResponseCache
+from ripplekg.ontology.schema import load_ontology
+from ripplekg.ontology.universe import load_universe
 
 ONT, UNIVERSE = load_ontology(), load_universe()
 CHUNKS = pd.DataFrame(

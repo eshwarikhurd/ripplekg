@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from ripplekg.ontology import Ontology
+from ripplekg.ontology.schema import Ontology
 
 FAMILY_CUES = {
     "trade": r"suppl(?:y|ier|iers|ies|ied)|offtake|off-take|customer|purchase[sd]? from|sole[- ]source|"
