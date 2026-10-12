@@ -21,9 +21,13 @@ with vector-only RAG, and every relationship's quoted evidence is checked progra
 
 ## Status
 
-Early stage. Done so far: the company universe ([config/universe.yaml](config/universe.yaml)), a
-rate-limited EDGAR client, and a coverage check of how densely these companies' filings mention each
-other ([docs/coverage.md](docs/coverage.md)).
+Early stage. Done so far:
+
+- the company universe ([config/universe.yaml](config/universe.yaml)) and a coverage check of how densely
+  these companies' filings mention each other ([docs/coverage.md](docs/coverage.md))
+- the benchmark: 23 real, dated disruptions ([config/events.yaml](config/events.yaml)) and the
+  evaluation protocol ([docs/protocol.md](docs/protocol.md)), both fixed before any price data or graph
+  existed
 
 ## Setup
 
@@ -36,6 +40,7 @@ cp .env.example .env        # set SEC_USER_AGENT to "RippleKG research <your ema
 make test                   # unit tests, no network
 uv run ripplekg universe-check   # validate company CIKs against EDGAR
 uv run ripplekg coverage         # co-mention density report -> docs/coverage.md
+uv run ripplekg events-check     # validate the benchmark events and pre-registered split
 ```
 
 ## Author
