@@ -29,18 +29,24 @@ class LLMResult:
     cache_read_tokens: int = 0
     cache_write_tokens: int = 0
     cached: bool = False  # served from the local cache: no cost incurred now
+    batch: bool = False  # produced by the Batch API, billed at half price
 
     @property
     def cost_usd(self) -> float:
         if self.cached or self.model not in PRICES:
             return 0.0
         inp, out = PRICES[self.model]
+        discount = 0.5 if self.batch else 1.0
         return (
-            self.input_tokens * inp
-            + self.cache_read_tokens * inp * 0.1
-            + self.cache_write_tokens * inp * 1.25
-            + self.output_tokens * out
-        ) / 1e6
+            discount
+            * (
+                self.input_tokens * inp
+                + self.cache_read_tokens * inp * 0.1
+                + self.cache_write_tokens * inp * 1.25
+                + self.output_tokens * out
+            )
+            / 1e6
+        )
 
 
 class LLMError(RuntimeError):
@@ -81,6 +87,53 @@ class ClaudeProvider:
     def complete_json(self, system: str, user: str, schema: dict, max_tokens: int = 4096) -> LLMResult:
         resp = self.client.messages.create(**self.request_params(system, user, schema, max_tokens))
         return result_from_message(resp)
+
+
+class OllamaProvider:
+    """A local model served by Ollama, with the JSON schema enforced as a grammar. Free to run."""
+
+    name = "ollama"
+
+    def __init__(
+        self,
+        model: str = "qwen2.5:7b",
+        host: str = "http://localhost:11434",
+        num_ctx: int = 8192,
+        timeout: float = 900.0,
+        session=None,
+    ):
+        import requests
+
+        self.model = model
+        self.host = host.rstrip("/")
+        self.num_ctx = num_ctx
+        self.timeout = timeout
+        self.session = session or requests.Session()
+
+    def complete_json(self, system: str, user: str, schema: dict, max_tokens: int = 4096) -> LLMResult:
+        resp = self.session.post(
+            f"{self.host}/api/chat",
+            json={
+                "model": self.model,
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                "format": schema,
+                "stream": False,
+                "options": {"temperature": 0, "num_ctx": self.num_ctx, "num_predict": max_tokens},
+            },
+            timeout=self.timeout,
+        )
+        if resp.status_code != 200:
+            raise LLMError(f"Ollama HTTP {resp.status_code}: {resp.text[:200]}")
+        data = resp.json()
+        if data.get("done_reason") == "length":
+            raise LLMError("response hit num_predict before the JSON was complete")
+        return LLMResult(
+            text=data["message"]["content"],
+            model=self.model,
+            stop_reason=data.get("done_reason", ""),
+            input_tokens=data.get("prompt_eval_count", 0),
+            output_tokens=data.get("eval_count", 0),
+        )
 
 
 def result_from_message(resp) -> LLMResult:

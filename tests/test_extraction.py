@@ -123,3 +123,18 @@ def test_verify_rejects_with_reasons():
     assert verify_edge(bad_strength, text, ONT, RESOLVER).reason == "strength not in quote"
     unresolved = {**base, "source": "Acme Widgets", "quote": "Sales to Tesla"}
     assert verify_edge(unresolved, text, ONT, RESOLVER).reason == "unresolved source"
+
+
+def test_ollama_provider_sends_schema_and_reads_counts():
+    from ripplekg.llm import OllamaProvider
+
+    class Session:
+        def post(self, url, json, timeout):
+            assert url.endswith("/api/chat") and json["format"]["type"] == "object"
+            assert json["options"]["temperature"] == 0
+            body = {"message": {"content": '{"edges": []}'}, "done_reason": "stop",
+                    "prompt_eval_count": 3000, "eval_count": 50}  # fmt: skip
+            return SimpleNamespace(status_code=200, json=lambda: body, text="")
+
+    r = OllamaProvider(session=Session()).complete_json("sys", "user", {"type": "object"})
+    assert (r.text, r.input_tokens, r.output_tokens, r.cost_usd) == ('{"edges": []}', 3000, 50, 0.0)
