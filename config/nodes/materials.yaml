@@ -1,0 +1,25 @@
+# Materials. `parent` builds a hierarchy: a shock to lithium reaches holders of lithium-carbonate.
+nodes:
+  - {id: lithium, name: Lithium, aliases: [lithium chemicals, lithium compounds, LCE, lithium carbonate equivalent]}
+  - {id: lithium-carbonate, name: Lithium carbonate, parent: lithium, aliases: [Li2CO3, battery-grade lithium carbonate]}
+  - {id: lithium-hydroxide, name: Lithium hydroxide, parent: lithium, aliases: [LiOH, lithium hydroxide monohydrate]}
+  - {id: spodumene, name: Spodumene, parent: lithium, aliases: [spodumene concentrate, SC6, lithium ore, hard-rock lithium]}
+  - {id: lepidolite, name: Lepidolite, parent: lithium, aliases: [lepidolite ore]}
+  - {id: lithium-brine, name: Lithium brine, parent: lithium, aliases: [brine]}
+  - {id: nickel, name: Nickel, aliases: [class 1 nickel, nickel matte, mixed hydroxide precipitate, MHP]}
+  - {id: nickel-sulfate, name: Nickel sulfate, parent: nickel, aliases: [nickel sulphate]}
+  - {id: cobalt, name: Cobalt, aliases: [cobalt hydroxide, cobalt sulfate, cobalt sulphate]}
+  - {id: manganese, name: Manganese, aliases: [manganese sulfate, high-purity manganese sulfate, HPMSM]}
+  - {id: graphite, name: Graphite, aliases: [graphite feedstock]}
+  - {id: natural-graphite, name: Natural graphite, parent: graphite, aliases: [flake graphite, natural flake graphite, spherical graphite]}
+  - {id: synthetic-graphite, name: Synthetic graphite, parent: graphite, aliases: [artificial graphite]}
+  - {id: silicon, name: Silicon, aliases: [silicon anode material, silicon oxide]}
+  - {id: copper, name: Copper, aliases: [copper cathode, copper concentrate]}
+  - {id: aluminum, name: Aluminum, aliases: [aluminium]}
+  - {id: iron-phosphate, name: Iron phosphate, aliases: [ferric phosphate, purified phosphoric acid]}
+  - {id: rare-earths, name: Rare earth elements, aliases: [rare earths, REE, rare earth oxides, separated rare earths]}
+  - {id: ndpr, name: NdPr oxide, parent: rare-earths, aliases: [neodymium-praseodymium, NdPr, neodymium, praseodymium]}
+  - {id: dysprosium, name: Dysprosium, parent: rare-earths, aliases: [Dy]}
+  - {id: terbium, name: Terbium, parent: rare-earths, aliases: [Tb]}
+  - {id: vanadium, name: Vanadium, aliases: [vanadium pentoxide]}
+  - {id: zinc, name: Zinc, aliases: []}

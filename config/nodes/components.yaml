@@ -1,0 +1,17 @@
+# Battery-chain components and other inputs that companies name as dependencies.
+nodes:
+  - {id: precursor-cam, name: Cathode precursor, aliases: [pCAM, precursor cathode active material, cathode precursor]}
+  - {id: cathode-active-material, name: Cathode active material, aliases: [CAM, cathode material, cathode, NMC cathode, LFP cathode]}
+  - {id: anode-active-material, name: Anode active material, aliases: [anode material, anode]}
+  - {id: separator, name: Separator, aliases: [battery separator, separator film]}
+  - {id: electrolyte, name: Electrolyte, aliases: [liquid electrolyte, solid electrolyte, LiPF6]}
+  - {id: copper-foil, name: Copper foil, aliases: [electrodeposited copper foil]}
+  - {id: battery-cell, name: Battery cells, aliases: [cells, lithium-ion cells, battery cells, prismatic cells, pouch cells, cylindrical cells]}
+  - {id: battery-module, name: Battery modules, aliases: [modules]}
+  - {id: battery-pack, name: Battery packs, aliases: [packs, battery systems]}
+  - {id: bess, name: Battery energy storage systems, aliases: [BESS, energy storage systems, stationary storage]}
+  - {id: battery-management-system, name: Battery management systems, aliases: [BMS]}
+  - {id: black-mass, name: Black mass, aliases: [recycled black mass]}
+  - {id: rare-earth-magnets, name: Rare-earth permanent magnets, aliases: [NdFeB magnets, permanent magnets]}
+  - {id: electric-drive-unit, name: Electric drive units, aliases: [electric motors, drive units, e-motors]}
+  - {id: semiconductors, name: Semiconductors, aliases: [chips, microchips, power semiconductors]}

@@ -1,0 +1,278 @@
+# Illustrative filing sentences with the edges an extractor should produce.
+# All company names are FICTIONAL. These serve as ontology documentation,
+# extraction prompt examples (week 5) and test fixtures.
+#
+# expect: list of edges; every `quote` must be a verbatim substring of `text`.
+#         An empty list is a negative example: the sentence must yield no edge.
+
+examples:
+  # ---------------------------------------------------------------- A. trade
+  - relation: SUPPLIES
+    text: >-
+      Sales to Borealis Motors, which purchases battery cells from us for its electric
+      pickup trucks, accounted for 41% of our revenue in 2023.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: active,
+         component: battery-cell, strength: 0.41, strength_basis: revenue_share,
+         quote: "accounted for 41% of our revenue in 2023"}
+
+  - relation: CUSTOMER_OF
+    text: >-
+      We purchase substantially all of our cathode active material from Halcyon Materials
+      under a supply agreement that runs through 2027.
+    filer: Northwind Cells
+    expect:
+      - {source: Halcyon Materials, relation: SUPPLIES, target: Northwind Cells, status: active,
+         component: cathode-active-material,
+         quote: "We purchase substantially all of our cathode active material from Halcyon Materials"}
+
+  - relation: OFFTAKE
+    text: >-
+      In March 2022 we entered into a binding offtake agreement with Borealis Motors for 60%
+      of Phase 1 lithium hydroxide production from the Ridgeway project for ten years.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: OFFTAKE, target: Borealis Motors, status: active,
+         material: lithium-hydroxide, strength: 0.60, strength_basis: output_share,
+         quote: "binding offtake agreement with Borealis Motors for 60%"}
+
+  - relation: OFFTAKE
+    text: >-
+      We are in discussions with several automakers regarding potential offtake arrangements,
+      but no agreements have been signed.
+    filer: Acme Lithium
+    expect: []
+    why: No named counterparty and no agreement.
+
+  - relation: TOLL_PROCESSES
+    text: >-
+      Under a tolling arrangement, Delta Refining converts our spodumene concentrate into
+      battery-grade lithium carbonate, which we then sell to customers.
+    filer: Acme Lithium
+    expect:
+      - {source: Delta Refining, relation: TOLL_PROCESSES, target: Acme Lithium, status: active,
+         material: spodumene, quote: "Delta Refining converts our spodumene concentrate"}
+
+  - relation: SOLE_SOURCES_FROM
+    text: >-
+      We currently rely on a single supplier, Ion Separators Ltd., for the separator film used
+      in all of our cells, and a disruption at its plant would halt our production.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: SOLE_SOURCES_FROM, target: Ion Separators Ltd., status: active,
+         component: separator, strength_basis: sole_source,
+         quote: "We currently rely on a single supplier, Ion Separators Ltd., for the separator film"}
+
+  - relation: SOLE_SOURCES_FROM
+    text: >-
+      Some of the components in our vehicles are sourced from single suppliers.
+    filer: Borealis Motors
+    expect: []
+    why: Generic risk-factor language with no named supplier.
+
+  - relation: LICENSES_TECHNOLOGY_TO
+    text: >-
+      We license our lithium iron phosphate cell technology to Borealis Motors for use at its
+      Michigan battery plant in exchange for royalties.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: LICENSES_TECHNOLOGY_TO, target: Borealis Motors, status: active,
+         component: battery-cell,
+         quote: "We license our lithium iron phosphate cell technology to Borealis Motors"}
+
+  - relation: DISTRIBUTES_FOR
+    text: >-
+      We integrate battery modules manufactured by Northwind Cells into the energy storage
+      systems we sell to utilities.
+    filer: Gridline Storage
+    expect:
+      - {source: Gridline Storage, relation: DISTRIBUTES_FOR, target: Northwind Cells, status: active,
+         component: battery-module,
+         quote: "We integrate battery modules manufactured by Northwind Cells"}
+
+  # ---------------------------------------------------------------- B. ownership and capital
+  - relation: SUBSIDIARY_OF
+    text: >-
+      Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium Australia Pty Ltd, relation: SUBSIDIARY_OF, target: Acme Lithium, status: active,
+         strength: 1.0, strength_basis: ownership_share,
+         quote: "Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium"}
+
+  - relation: INVESTS_IN
+    text: >-
+      Borealis Motors holds approximately 9.9% of our outstanding common shares following its
+      strategic investment in 2021.
+    filer: Acme Lithium
+    expect:
+      - {source: Borealis Motors, relation: INVESTS_IN, target: Acme Lithium, status: active,
+         strength: 0.099, strength_basis: ownership_share,
+         quote: "Borealis Motors holds approximately 9.9% of our outstanding common shares"}
+
+  - relation: JV_PARTNER_IN
+    text: >-
+      Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview
+      cell plant.
+    filer: Borealis Motors
+    expect:
+      - {source: Borealis Motors, relation: JV_PARTNER_IN, target: Lakeview cell plant, status: active,
+         strength: 0.5, strength_basis: ownership_share,
+         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview"}
+      - {source: Northwind Cells, relation: JV_PARTNER_IN, target: Lakeview cell plant, status: active,
+         strength: 0.5, strength_basis: ownership_share,
+         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview"}
+
+  - relation: FINANCES_SUPPLY
+    text: >-
+      Borealis Motors made a $200 million prepayment to us, to be credited against future
+      deliveries of lithium carbonate.
+    filer: Acme Lithium
+    expect:
+      - {source: Borealis Motors, relation: FINANCES_SUPPLY, target: Acme Lithium, status: active,
+         material: lithium-carbonate,
+         quote: "Borealis Motors made a $200 million prepayment to us"}
+
+  - relation: ACQUIRES
+    text: >-
+      On July 1, 2024, we completed our acquisition of Halcyon Materials.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: ACQUIRES, target: Halcyon Materials, status: active,
+         quote: "we completed our acquisition of Halcyon Materials"}
+
+  - relation: ACQUIRES
+    text: >-
+      Our proposed acquisition of Halcyon Materials was terminated after regulators declined
+      to approve it.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: ACQUIRES, target: Halcyon Materials, status: negated,
+         quote: "Our proposed acquisition of Halcyon Materials was terminated"}
+
+  # ---------------------------------------------------------------- C. footprint and materials
+  - relation: OPERATES
+    text: >-
+      We own and operate the Ridgeway lithium mine in Nevada.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: OPERATES, target: Ridgeway lithium mine, status: active,
+         quote: "We own and operate the Ridgeway lithium mine in Nevada"}
+      - {source: Ridgeway lithium mine, relation: LOCATED_IN, target: Nevada, status: active,
+         quote: "the Ridgeway lithium mine in Nevada"}
+
+  - relation: LOCATED_IN
+    text: >-
+      The Lakeview cell plant, located in Ohio, began production in 2022.
+    filer: Northwind Cells
+    expect:
+      - {source: Lakeview cell plant, relation: LOCATED_IN, target: Ohio, status: active,
+         quote: "The Lakeview cell plant, located in Ohio"}
+
+  - relation: PRODUCES
+    text: >-
+      The Ridgeway project is designed to produce 40,000 tonnes per year of battery-grade
+      lithium hydroxide.
+    filer: Acme Lithium
+    expect:
+      - {source: Ridgeway project, relation: PRODUCES, target: lithium hydroxide, status: planned,
+         quote: "designed to produce 40,000 tonnes per year of battery-grade lithium hydroxide"}
+
+  - relation: CONSUMES
+    text: >-
+      Our cells require lithium, nickel and cobalt, and increases in the prices of these
+      materials have materially increased our cost of goods sold.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: CONSUMES, target: lithium, status: active,
+         quote: "Our cells require lithium, nickel and cobalt"}
+      - {source: Northwind Cells, relation: CONSUMES, target: nickel, status: active,
+         quote: "Our cells require lithium, nickel and cobalt"}
+      - {source: Northwind Cells, relation: CONSUMES, target: cobalt, status: active,
+         quote: "Our cells require lithium, nickel and cobalt"}
+
+  # ---------------------------------------------------------------- D. competition
+  - relation: COMPETES_WITH
+    text: >-
+      Our principal competitors in battery cells include Northwind Cells and several large
+      Asian manufacturers.
+    filer: Polaris Battery
+    expect:
+      - {source: Polaris Battery, relation: COMPETES_WITH, target: Northwind Cells, status: active,
+         quote: "Our principal competitors in battery cells include Northwind Cells"}
+
+  # ---------------------------------------------------------------- E. external exposure
+  - relation: SOURCES_FROM_REGION
+    text: >-
+      Approximately 70% of the graphite used in our anodes is sourced from China.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: SOURCES_FROM_REGION, target: China, status: active,
+         strength: 0.70, strength_basis: purchase_share,
+         quote: "Approximately 70% of the graphite used in our anodes is sourced from China"}
+
+  - relation: SUBJECT_TO_TRADE_RESTRICTION
+    text: >-
+      China's Ministry of Commerce now requires export licences for certain graphite products,
+      which could delay shipments of anode material to our plants.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: SUBJECT_TO_TRADE_RESTRICTION, target: China's Ministry of Commerce,
+         status: active, quote: "China's Ministry of Commerce now requires export licences for certain graphite products"}
+
+  - relation: RECEIVES_INCENTIVE
+    text: >-
+      We recognized $85 million of advanced manufacturing production credits under Section 45X
+      of the Internal Revenue Code during the year.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: RECEIVES_INCENTIVE, target: Section 45X, status: active,
+         quote: "We recognized $85 million of advanced manufacturing production credits under Section 45X"}
+
+  - relation: REGULATED_BY
+    text: >-
+      Construction of the Ridgeway mine requires a record of decision from the Bureau of Land
+      Management.
+    filer: Acme Lithium
+    expect:
+      - {source: Ridgeway mine, relation: REGULATED_BY, target: Bureau of Land Management, status: active,
+         quote: "requires a record of decision from the Bureau of Land Management"}
+
+  - relation: EXPOSED_TO_CATASTROPHE
+    text: >-
+      Our Bayport cathode plant in Texas is exposed to hurricanes, and a severe storm could
+      interrupt production for an extended period.
+    filer: Halcyon Materials
+    expect:
+      - {source: Bayport cathode plant, relation: EXPOSED_TO_CATASTROPHE, target: Texas, status: active,
+         hazard: hurricane, quote: "Our Bayport cathode plant in Texas is exposed to hurricanes"}
+
+  # ---------------------------------------------------------------- F. disputes
+  - relation: IN_DISPUTE_WITH
+    text: >-
+      In 2023 Halcyon Materials filed an arbitration claim against us alleging breach of our
+      cathode supply agreement.
+    filer: Northwind Cells
+    expect:
+      - {source: Halcyon Materials, relation: IN_DISPUTE_WITH, target: Northwind Cells, status: active,
+         quote: "Halcyon Materials filed an arbitration claim against us"}
+
+  - relation: PENALIZED_BY
+    text: >-
+      In June 2024 the National Highway Traffic Safety Administration ordered a recall of
+      12,000 vehicles equipped with our battery packs.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: PENALIZED_BY, target: National Highway Traffic Safety Administration,
+         status: active, quote: "the National Highway Traffic Safety Administration ordered a recall"}
+
+  # ---------------------------------------------------------------- status edge cases
+  - relation: SUPPLIES
+    text: >-
+      Our supply agreement with Borealis Motors was terminated in the fourth quarter, and we no
+      longer sell cells to Borealis.
+    filer: Northwind Cells
+    expect:
+      - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: ceased,
+         component: battery-cell, quote: "we no longer sell cells to Borealis"}

@@ -79,6 +79,23 @@ def cmd_events_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ontology_doc(args: argparse.Namespace) -> int:
+    from ripplekg.ontology import example_errors, load_examples, load_ontology
+    from ripplekg.ontology_doc import render
+
+    ont, examples = load_ontology(), load_examples()
+    errors = example_errors(ont, examples)
+    if errors:
+        print("invalid relation examples:\n  " + "\n  ".join(errors), file=sys.stderr)
+        return 1
+    out = settings.DOCS_DIR / "ontology.md"
+    out.write_text(render(ont, examples))
+    n_nodes = sum(n.kind != "company" for n in ont.nodes.values())
+    print(f"{len(ont.relations)} relations, {n_nodes} curated nodes, {len(examples)} examples")
+    print(f"wrote {out.relative_to(settings.ROOT)}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -97,6 +114,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("events-check", help="validate config/events.yaml and the pre-registered split")
     p.set_defaults(func=cmd_events_check)
+
+    p = sub.add_parser("ontology-doc", help="validate relation examples and regenerate docs/ontology.md")
+    p.set_defaults(func=cmd_ontology_doc)
     return parser
 
 
