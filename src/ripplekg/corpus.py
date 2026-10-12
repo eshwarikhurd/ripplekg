@@ -1,0 +1,165 @@
+"""Corpus index: every filing from the universe's filers, and whether it feeds extraction.
+
+Selection rules (documented in docs/corpus.md):
+
+- Annual reports (10-K, 20-F, 40-F) and quarterly reports (10-Q): always selected.
+- 8-K: selected only if it reports an item that can describe a supply-chain relationship
+  or disruption (SELECTED_8K_ITEMS).
+- Amendments (forms ending in /A) and 6-K reports: indexed but not selected. 6-Ks have
+  no item codes, so there is no reliable way to pick the relevant ones yet.
+- Everything else (ownership forms, proxies, registration statements): not indexed.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from pathlib import Path
+
+import pandas as pd
+
+from ripplekg.edgar.client import EdgarClient
+from ripplekg.edgar.index import Filing, list_filings
+from ripplekg.universe import Universe
+
+ANNUAL = {"10-K", "20-F", "40-F"}
+QUARTERLY = {"10-Q"}
+CURRENT = {"8-K", "6-K"}
+INDEXED_FORMS = ANNUAL | QUARTERLY | CURRENT | {f + "/A" for f in ANNUAL | QUARTERLY | CURRENT}
+
+SELECTED_8K_ITEMS = {
+    "1.01": "entry into a material definitive agreement",
+    "1.02": "termination of a material definitive agreement",
+    "1.03": "bankruptcy or receivership",
+    "2.01": "completion of acquisition or disposition of assets",
+    "2.05": "costs associated with exit or disposal activities",
+    "2.06": "material impairments",
+    "7.01": "Regulation FD disclosure",
+    "8.01": "other events",
+}
+
+COLUMNS = [
+    "company_id",
+    "cik",
+    "accession",
+    "form",
+    "filing_date",
+    "report_date",
+    "accepted_et",
+    "items",
+    "description",
+    "primary_document",
+    "url",
+    "selected",
+    "reason",
+]
+
+
+def selection(f: Filing) -> tuple[bool, str]:
+    """(selected?, reason) for one filing."""
+    if f.form.endswith("/A"):
+        return False, "amendment"
+    if f.form in ANNUAL:
+        return True, "annual report"
+    if f.form in QUARTERLY:
+        return True, "quarterly report"
+    if f.form == "8-K":
+        items = {i.strip() for i in f.items.split(",") if i.strip()}
+        hit = sorted(items & SELECTED_8K_ITEMS.keys())
+        if hit:
+            return True, "8-K items " + ",".join(hit)
+        return False, "8-K items not selected"
+    if f.form == "6-K":
+        return False, "6-K (no item codes)"
+    return False, "form not used"
+
+
+def build_index(
+    client: EdgarClient,
+    universe: Universe,
+    start: str,
+    end: str,
+    progress: Callable[[str], None] = lambda _: None,
+) -> pd.DataFrame:
+    rows = []
+    for c in universe.filers:
+        filings = list_filings(client, c.cik, start, end, forms=INDEXED_FORMS)
+        for f in filings:
+            selected, reason = selection(f)
+            et = f.accepted_et
+            rows.append(
+                {
+                    "company_id": c.id,
+                    "cik": c.cik,
+                    "accession": f.accession,
+                    "form": f.form,
+                    "filing_date": f.filing_date,
+                    "report_date": f.report_date,
+                    "accepted_et": et.strftime("%Y-%m-%d %H:%M:%S") if et else "",
+                    "items": f.items,
+                    "description": f.description,
+                    "primary_document": f.primary_document,
+                    "url": f.url,
+                    "selected": selected,
+                    "reason": reason,
+                }
+            )
+        progress(f"{c.id}: {len(filings)} filings")
+    df = pd.DataFrame(rows, columns=COLUMNS)
+    return df.sort_values(["company_id", "filing_date", "accession"], ignore_index=True)
+
+
+def summary_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Selected filings per company and form group."""
+    sel = df[df["selected"]].copy()
+    sel["group"] = sel["form"].map(lambda f: "annual" if f in ANNUAL else ("10-Q" if f == "10-Q" else "8-K"))
+    table = sel.pivot_table(
+        index="company_id", columns="group", values="accession", aggfunc="count", fill_value=0
+    )
+    for col in ("annual", "10-Q", "8-K"):
+        if col not in table:
+            table[col] = 0
+    table = table[["annual", "10-Q", "8-K"]]
+    table["total"] = table.sum(axis=1)
+    return table.reset_index()
+
+
+def write_report(path: Path, df: pd.DataFrame, start: str, end: str) -> None:
+    table = summary_table(df)
+    is_selected_8k = (df["form"] == "8-K") & df["selected"]
+    reasons = df["reason"].mask(is_selected_8k, "8-K with a selected item")
+    by_reason = reasons.value_counts().rename_axis("reason").reset_index(name="filings")
+
+    def md(t: pd.DataFrame) -> str:
+        cols = list(t.columns)
+        lines = ["| " + " | ".join(map(str, cols)) + " |", "|" + "---|" * len(cols)]
+        lines += ["| " + " | ".join(str(v) for v in row) + " |" for row in t.itertuples(index=False)]
+        return "\n".join(lines)
+
+    items = "\n".join(f"- `{k}` {v}" for k, v in SELECTED_8K_ITEMS.items())
+    text = f"""# Corpus
+
+Generated by `ripplekg index` from the EDGAR submissions API. Filings dated {start} to {end}
+from the {df["company_id"].nunique()} SEC filers in the universe. The full index (with acceptance times,
+used for the protocol's information cut-off) is written to `data/index/filings.parquet`.
+
+## Selection rules
+
+- Annual reports (10-K, 20-F, 40-F) and quarterly reports (10-Q) are always selected.
+- An 8-K is selected if it reports at least one of these items:
+{items}
+- Amendments (`/A`) and 6-K reports are indexed but not selected. 6-Ks carry no item codes, so
+  relevant ones cannot yet be told apart from routine notices. Foreign filers are covered through
+  their 20-F and 40-F annual reports.
+
+## Totals
+
+{len(df)} filings indexed, **{int(df["selected"].sum())} selected** for extraction.
+
+{md(by_reason)}
+
+## Selected filings per company
+
+{md(table)}
+"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)

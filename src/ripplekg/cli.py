@@ -96,6 +96,22 @@ def cmd_ontology_doc(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_index(args: argparse.Namespace) -> int:
+    from ripplekg import corpus
+
+    df = corpus.build_index(
+        _client(), load_universe(), args.start, args.end, progress=lambda m: print(m, flush=True)
+    )
+    out = settings.DATA_DIR / "index" / "filings.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, index=False)
+    report = settings.DOCS_DIR / "corpus.md"
+    corpus.write_report(report, df, args.start, args.end)
+    print(f"\n{len(df)} filings indexed, {int(df['selected'].sum())} selected")
+    print(f"wrote {out.relative_to(settings.ROOT)} and {report.relative_to(settings.ROOT)}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -117,6 +133,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("ontology-doc", help="validate relation examples and regenerate docs/ontology.md")
     p.set_defaults(func=cmd_ontology_doc)
+
+    p = sub.add_parser("index", help="index the universe's filings and select the extraction corpus")
+    window(p)
+    p.set_defaults(func=cmd_index)
     return parser
 
 
