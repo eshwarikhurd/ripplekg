@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ripplekg.gold import build_sheet, score
+from ripplekg.extraction.gold import build_sheet, score
 
 CHUNKS = pd.DataFrame(
     {"chunk_id": ["c1"], "text": ["Intro. We buy cells from Panasonic under a supply deal. More."]}

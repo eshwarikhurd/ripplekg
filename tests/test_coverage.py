@@ -1,7 +1,7 @@
 import pandas as pd
 
-from ripplekg import coverage
-from ripplekg.universe import parse_universe
+from ripplekg.download import coverage
+from ripplekg.ontology.universe import parse_universe
 
 
 def universe(n_filers=3):

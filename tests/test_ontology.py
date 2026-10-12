@@ -1,8 +1,8 @@
 import pytest
 
-from ripplekg.events import load_events
-from ripplekg.ontology import OntologyError, build_ontology, load_ontology, normalize_name
-from ripplekg.universe import load_universe
+from ripplekg.evaluation.events import load_events
+from ripplekg.ontology.schema import OntologyError, build_ontology, load_ontology, normalize_name
+from ripplekg.ontology.universe import load_universe
 
 ONT = load_ontology()
 UNIVERSE = load_universe()
@@ -117,13 +117,13 @@ def test_yaml_boolean_id_is_rejected():
 
 
 def test_relation_examples_are_valid_and_cover_every_relation():
-    from ripplekg.ontology import example_errors, load_examples
+    from ripplekg.ontology.schema import example_errors, load_examples
 
     assert example_errors(ONT, load_examples()) == []
 
 
 def test_example_errors_catch_paraphrased_quotes():
-    from ripplekg.ontology import Example, example_errors
+    from ripplekg.ontology.schema import Example, example_errors
 
     ex = Example(
         "SUPPLIES",
@@ -143,8 +143,8 @@ def test_example_errors_catch_paraphrased_quotes():
 
 
 def test_ontology_doc_is_up_to_date():
-    from ripplekg.ontology import load_examples
-    from ripplekg.ontology_doc import render
+    from ripplekg.ontology.doc import render
+    from ripplekg.ontology.schema import load_examples
     from ripplekg.settings import DOCS_DIR
 
     assert (DOCS_DIR / "ontology.md").read_text() == render(ONT, load_examples()), (

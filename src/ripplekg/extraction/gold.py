@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.verify import normalize_text
+from ripplekg.extraction.verify import normalize_text
 
 SHEET_COLUMNS = ["row", "filer", "source", "relation", "target", "status", "strength", "quote", "context",
                  "label", "note"]  # fmt: skip

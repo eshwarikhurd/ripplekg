@@ -1,10 +1,10 @@
 import json
 from types import SimpleNamespace
 
-from ripplekg.extraction import build_prompt, build_schema, extract
-from ripplekg.llm import ClaudeProvider, ResponseCache
-from ripplekg.ontology import load_examples, load_ontology
-from ripplekg.verify import Resolver, quote_in_text, strength_backed, verify_edge
+from ripplekg.extraction.llm import ClaudeProvider, ResponseCache
+from ripplekg.extraction.prompts import build_prompt, build_schema, extract
+from ripplekg.extraction.verify import Resolver, quote_in_text, strength_backed, verify_edge
+from ripplekg.ontology.schema import load_examples, load_ontology
 
 ONT = load_ontology()
 EXAMPLES = load_examples()
@@ -126,7 +126,7 @@ def test_verify_rejects_with_reasons():
 
 
 def test_ollama_provider_sends_schema_and_reads_counts():
-    from ripplekg.llm import OllamaProvider
+    from ripplekg.extraction.llm import OllamaProvider
 
     class Session:
         def post(self, url, json, timeout):

@@ -17,9 +17,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.edgar.index import Filing, list_filings
-from ripplekg.universe import Universe
+from ripplekg.download.client import EdgarClient
+from ripplekg.download.index import Filing, list_filings
+from ripplekg.ontology.universe import Universe
 
 ANNUAL = {"10-K", "20-F", "40-F"}
 QUARTERLY = {"10-Q"}

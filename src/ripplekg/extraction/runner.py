@@ -9,11 +9,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from ripplekg.extraction import PROMPT_VERSION, ExtractionOutcome, build_prompt, extract
-from ripplekg.llm import LLMProvider, ResponseCache
-from ripplekg.ontology import Ontology, load_examples
-from ripplekg.universe import Universe
-from ripplekg.verify import Resolver, verify_edge
+from ripplekg.extraction.llm import LLMProvider, ResponseCache
+from ripplekg.extraction.prompts import PROMPT_VERSION, ExtractionOutcome, build_prompt, extract
+from ripplekg.extraction.verify import Resolver, verify_edge
+from ripplekg.ontology.schema import Ontology, load_examples
+from ripplekg.ontology.universe import Universe
 
 ANNUAL_FORMS = {"10-K", "20-F", "40-F"}
 

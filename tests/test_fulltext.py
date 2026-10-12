@@ -1,7 +1,7 @@
 from fakes import FakeSession, json_response
 
-from ripplekg.edgar.client import EdgarClient
-from ripplekg.edgar.fulltext import build_params, count_hits
+from ripplekg.download.client import EdgarClient
+from ripplekg.download.fulltext import build_params, count_hits
 
 
 def test_build_params_pads_ciks_and_sets_custom_range():

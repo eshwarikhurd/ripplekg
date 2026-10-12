@@ -1,4 +1,4 @@
-from ripplekg.parse.sections import split_sections
+from ripplekg.ingestion.sections import split_sections
 
 FILLER = "This paragraph describes our business in detail. " * 10
 

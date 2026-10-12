@@ -15,8 +15,8 @@ from pathlib import Path
 
 import yaml
 
+from ripplekg.ontology.universe import Universe, load_universe
 from ripplekg.settings import CONFIG_DIR
-from ripplekg.universe import Universe, load_universe
 
 NODE_KINDS = {"company", "facility", "material", "component", "region", "authority", "program"}
 SHOCK_TYPES = {"supply_shock", "demand_shock", "mixed"}
