@@ -1,0 +1,46 @@
+# Regions: ISO 3166 country codes, selected subdivisions (parent = country) and chokepoints.
+nodes:
+  - {id: US, name: United States, aliases: [U.S., USA, United States of America]}
+  - {id: CN, name: China, aliases: [PRC, People's Republic of China, mainland China]}
+  - {id: CL, name: Chile, aliases: []}
+  - {id: AR, name: Argentina, aliases: []}
+  - {id: BO, name: Bolivia, aliases: []}
+  - {id: AU, name: Australia, aliases: []}
+  - {id: CA, name: Canada, aliases: []}
+  - {id: CD, name: Democratic Republic of the Congo, aliases: [DRC, DR Congo, Congo (Kinshasa)]}
+  - {id: ZW, name: Zimbabwe, aliases: []}
+  - {id: ID, name: Indonesia, aliases: []}
+  - {id: PH, name: Philippines, aliases: []}
+  - {id: KR, name: South Korea, aliases: [Korea, Republic of Korea]}
+  - {id: JP, name: Japan, aliases: []}
+  - {id: TW, name: Taiwan, aliases: []}
+  - {id: DE, name: Germany, aliases: []}
+  - {id: SE, name: Sweden, aliases: []}
+  - {id: HU, name: Hungary, aliases: []}
+  - {id: PL, name: Poland, aliases: []}
+  - {id: "NO", name: Norway, aliases: []}
+  - {id: MX, name: Mexico, aliases: []}
+  - {id: BR, name: Brazil, aliases: []}
+  - {id: IN, name: India, aliases: []}
+  - {id: RU, name: Russia, aliases: [Russian Federation]}
+  - {id: UA, name: Ukraine, aliases: []}
+  - {id: MM, name: Myanmar, aliases: [Burma]}
+  - {id: EU, name: European Union, aliases: [EU]}
+  - {id: US-NV, name: Nevada, parent: US, aliases: []}
+  - {id: US-CA, name: California, parent: US, aliases: []}
+  - {id: US-NC, name: North Carolina, parent: US, aliases: []}
+  - {id: US-GA, name: Georgia (US state), parent: US, aliases: []}
+  - {id: US-MI, name: Michigan, parent: US, aliases: []}
+  - {id: US-KY, name: Kentucky, parent: US, aliases: []}
+  - {id: US-TN, name: Tennessee, parent: US, aliases: []}
+  - {id: US-OH, name: Ohio, parent: US, aliases: []}
+  - {id: US-TX, name: Texas, parent: US, aliases: []}
+  - {id: US-AZ, name: Arizona, parent: US, aliases: []}
+  - {id: US-NY, name: New York, parent: US, aliases: []}
+  - {id: US-AR, name: Arkansas, parent: US, aliases: []}
+  - {id: AU-WA, name: Western Australia, parent: AU, aliases: []}
+  - {id: CA-QC, name: Quebec, parent: CA, aliases: [Québec]}
+  - {id: CN-shanghai, name: Shanghai, parent: CN, aliases: []}
+  - {id: CN-jiangxi, name: Jiangxi, parent: CN, aliases: [Yichun]}
+  - {id: suez-canal, name: Suez Canal, aliases: []}
+  - {id: red-sea, name: Red Sea shipping lane, aliases: [Red Sea, Bab el-Mandeb]}

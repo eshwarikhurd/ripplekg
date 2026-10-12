@@ -1,0 +1,10 @@
+# Government programs that companies receive incentives from or depend on.
+nodes:
+  - {id: US-IRA, name: Inflation Reduction Act, authority: US-TREASURY, aliases: [IRA]}
+  - {id: US-IRA-30D, name: Clean vehicle credit (IRC 30D), parent: US-IRA, authority: US-TREASURY, aliases: [30D, clean vehicle credit, EV tax credit]}
+  - {id: US-IRA-45X, name: Advanced manufacturing production credit (IRC 45X), parent: US-IRA, authority: US-TREASURY, aliases: [45X, advanced manufacturing production credit]}
+  - {id: US-IRA-48C, name: Qualifying advanced energy project credit (IRC 48C), parent: US-IRA, authority: US-TREASURY, aliases: [48C]}
+  - {id: US-DOE-LPO, name: DOE Loan Programs Office, authority: US-DOE, aliases: [LPO, ATVM, Advanced Technology Vehicles Manufacturing loan]}
+  - {id: US-BIL-BATTERY, name: Bipartisan Infrastructure Law battery manufacturing grants, authority: US-DOE, aliases: [Battery Materials Processing and Battery Manufacturing grants, MESC grants]}
+  - {id: US-DPA-TITLE3, name: Defense Production Act Title III, authority: US-DOD, aliases: [DPA Title III, Defense Production Act]}
+  - {id: EU-CRMA, name: EU Critical Raw Materials Act, authority: EU-COMMISSION, aliases: [Critical Raw Materials Act, CRMA]}

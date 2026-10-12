@@ -1,0 +1,18 @@
+# Facilities: mines, refineries, cell and vehicle plants. Seeded with well-known sites;
+# grows from reviewed extractions. `operators` are universe company ids.
+nodes:
+  - {id: tesla-giga-nevada, name: Tesla Gigafactory Nevada, operators: [TSLA, PANASONIC], region: US-NV, kind: cell_plant, aliases: [Gigafactory Nevada, Gigafactory 1, Giga Nevada]}
+  - {id: tesla-giga-shanghai, name: Tesla Gigafactory Shanghai, operators: [TSLA], region: CN-shanghai, kind: vehicle_plant, aliases: [Gigafactory Shanghai, Giga Shanghai]}
+  - {id: tesla-giga-berlin, name: Tesla Gigafactory Berlin-Brandenburg, operators: [TSLA], region: DE, kind: vehicle_plant, aliases: [Gigafactory Berlin, Giga Berlin, Gigafactory Berlin-Brandenburg]}
+  - {id: thacker-pass, name: Thacker Pass, operators: [LAC, GM], region: US-NV, kind: lithium_mine, aliases: [Thacker Pass project]}
+  - {id: mountain-pass, name: Mountain Pass, operators: [MP], region: US-CA, kind: rare_earth_mine, aliases: [Mountain Pass mine]}
+  - {id: kings-mountain, name: Kings Mountain, operators: [ALB], region: US-NC, kind: lithium_mine, aliases: [Kings Mountain mine]}
+  - {id: salar-de-atacama, name: Salar de Atacama, operators: [SQM, ALB], region: CL, kind: lithium_brine, aliases: [Atacama]}
+  - {id: kemerton, name: Kemerton lithium hydroxide plant, operators: [ALB], region: AU-WA, kind: lithium_refinery, aliases: [Kemerton]}
+  - {id: greenbushes, name: Greenbushes, operators: [TIANQI, ALB], region: AU-WA, kind: lithium_mine, aliases: [Greenbushes mine, Talison]}
+  - {id: ultium-cells-lordstown, name: Ultium Cells Lordstown, operators: [ULTIUM, GM, LGES], region: US-OH, kind: cell_plant, aliases: [Ultium Lordstown]}
+  - {id: blueoval-sk-kentucky, name: BlueOval SK Kentucky, operators: [BLUEOVALSK, F, SKON], region: US-KY, kind: cell_plant, aliases: [BlueOval SK Battery Park Kentucky]}
+  - {id: hyundai-lges-georgia, name: Hyundai–LGES battery plant (Georgia), operators: [HYUNDAI, LGES], region: US-GA, kind: cell_plant, aliases: [HL-GA Battery Company, Hyundai Metaplant battery plant]}
+  - {id: licycle-rochester-hub, name: Li-Cycle Rochester Hub, operators: [LICY], region: US-NY, kind: recycling_plant, aliases: [Rochester Hub]}
+  - {id: jianxiawo, name: Jianxiawo lepidolite mine, operators: [CATL], region: CN-jiangxi, kind: lithium_mine, aliases: [Jianxiawo]}
+  - {id: grasberg, name: Grasberg, operators: [FCX], region: ID, kind: copper_mine, aliases: [Grasberg minerals district, Grasberg Block Cave]}

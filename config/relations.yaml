@@ -1,0 +1,246 @@
+# RippleKG relation types. See docs/ontology.md for definitions and examples.
+#
+#   family     A trade | B ownership_capital | C footprint | D competition | E exposure | F disputes
+#   source / target   allowed node kinds at each end (enforced when edges are built)
+#   channel    how a shock travels along the edge in ripple scoring:
+#                supply_chain  directional trade link. `upstream` names the supplying end:
+#                              supply shocks flow upstream -> downstream, demand shocks the reverse
+#                both          either kind of shock, either direction (ownership, joint ventures)
+#                hub           node of kind material/component/region/authority/program/facility passes
+#                              a shock from itself to linked companies, never between companies
+#                competitive   opposite-sign channel, used only by the sign analysis
+#                event         a dated fact, not a standing channel
+#   upstream   source | target, for supply_chain relations only
+#   prior      fixed relative weight when no dependency strength is disclosed:
+#                strong 1.0 | normal 0.6 | weak 0.3 (set before any data; not tuned)
+#   symmetric  stored as two directed edges
+#   strength_bases   which disclosed percentages may set the edge's strength
+
+relations:
+  # ---------------------------------------------------------------- A. trade links
+  SUPPLIES:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: source
+    prior: normal
+    strength_bases: [revenue_share, purchase_share]
+    attributes: [material, component]
+    description: Source sells goods or materials to target.
+  OFFTAKE:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: source
+    prior: strong
+    strength_bases: [output_share, revenue_share]
+    attributes: [material]
+    description: Long-term agreement for target to buy source's mine or refinery output.
+  TOLL_PROCESSES:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: source
+    prior: normal
+    strength_bases: [output_share]
+    attributes: [material]
+    description: Source converts material that target owns (tolling or contract refining).
+  SOLE_SOURCES_FROM:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: target
+    prior: strong
+    strength_bases: [purchase_share, sole_source]
+    attributes: [material, component]
+    description: Source states that target is its sole, single or limited supplier.
+  LICENSES_TECHNOLOGY_TO:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: source
+    prior: weak
+    strength_bases: []
+    attributes: [component]
+    description: Source licenses battery chemistry, cell design or process technology to target.
+  DISTRIBUTES_FOR:
+    family: trade
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: target
+    prior: weak
+    strength_bases: [revenue_share]
+    attributes: [component]
+    description: Source resells or integrates target's products (for example an energy-storage integrator).
+
+  # ---------------------------------------------------------------- B. ownership and capital
+  SUBSIDIARY_OF:
+    family: ownership_capital
+    source: [company]
+    target: [company]
+    channel: both
+    prior: strong
+    strength_bases: [ownership_share]
+    description: Source is a consolidated subsidiary of target.
+  INVESTS_IN:
+    family: ownership_capital
+    source: [company]
+    target: [company]
+    channel: both
+    prior: weak
+    strength_bases: [ownership_share]
+    description: Source holds a minority equity stake in target.
+  JV_PARTNER_IN:
+    family: ownership_capital
+    source: [company]
+    target: [facility]
+    channel: both
+    prior: normal
+    strength_bases: [ownership_share]
+    description: Source is a joint-venture partner in facility target.
+  FINANCES_SUPPLY:
+    family: ownership_capital
+    source: [company]
+    target: [company]
+    channel: supply_chain
+    upstream: target
+    prior: normal
+    strength_bases: [amount_ratio]
+    attributes: [material, component]
+    description: Source prepays, lends to or invests in target to secure future supply.
+  ACQUIRES:
+    family: ownership_capital
+    source: [company]
+    target: [company]
+    channel: event
+    prior: normal
+    strength_bases: []
+    description: Source acquires target. Closes target's edges from the closing date and moves them to source.
+
+  # ---------------------------------------------------------------- C. footprint and materials
+  OPERATES:
+    family: footprint
+    source: [company]
+    target: [facility]
+    channel: both
+    prior: strong
+    strength_bases: [output_share]
+    description: Source owns or operates facility target.
+  LOCATED_IN:
+    family: footprint
+    source: [facility]
+    target: [region]
+    channel: hub
+    prior: strong
+    strength_bases: []
+    description: Facility source is located in region target.
+  PRODUCES:
+    family: footprint
+    source: [company, facility]
+    target: [material, component]
+    channel: hub
+    prior: normal
+    strength_bases: [output_share, revenue_share]
+    description: Source produces material or component target.
+  CONSUMES:
+    family: footprint
+    source: [company]
+    target: [material, component]
+    channel: hub
+    prior: normal
+    strength_bases: [cost_share, purchase_share]
+    description: Source depends on material or component target as an input.
+
+  # ---------------------------------------------------------------- D. competition
+  COMPETES_WITH:
+    family: competition
+    source: [company]
+    target: [company]
+    channel: competitive
+    prior: weak
+    symmetric: true
+    strength_bases: []
+    description: Source names target as a competitor.
+
+  # ---------------------------------------------------------------- E. external exposure
+  SOURCES_FROM_REGION:
+    family: exposure
+    source: [company]
+    target: [region]
+    channel: hub
+    prior: normal
+    strength_bases: [purchase_share, revenue_share, cost_share]
+    description: Source buys from or operates in region target to a stated or material degree.
+  SUBJECT_TO_TRADE_RESTRICTION:
+    family: exposure
+    source: [company, material, component]
+    target: [authority, region]
+    channel: hub
+    prior: normal
+    strength_bases: [revenue_share, purchase_share]
+    description: Source is affected by an export control, tariff or foreign-entity rule imposed by target.
+  RECEIVES_INCENTIVE:
+    family: exposure
+    source: [company]
+    target: [program]
+    channel: hub
+    prior: normal
+    strength_bases: [amount_ratio]
+    description: Source receives or relies on a tax credit, grant or loan under program target.
+  REGULATED_BY:
+    family: exposure
+    source: [company, facility]
+    target: [authority]
+    channel: hub
+    prior: weak
+    strength_bases: []
+    description: Source needs permits, licences or approvals from authority target.
+  EXPOSED_TO_CATASTROPHE:
+    family: exposure
+    source: [company, facility]
+    target: [region]
+    channel: hub
+    prior: weak
+    strength_bases: []
+    attributes: [hazard]
+    description: Source states exposure to a natural hazard (earthquake, flood, drought, water rights) in region target.
+
+  # ---------------------------------------------------------------- F. disputes
+  IN_DISPUTE_WITH:
+    family: disputes
+    source: [company]
+    target: [company]
+    channel: both
+    prior: weak
+    symmetric: true
+    strength_bases: []
+    description: Litigation or arbitration between the two companies, often over a supply contract.
+  PENALIZED_BY:
+    family: disputes
+    source: [company]
+    target: [authority]
+    channel: event
+    prior: normal
+    strength_bases: []
+    description: Source receives a fine, recall order or sanction from authority target.
+
+# Labels the extractor may emit that are rewritten into a canonical relation.
+aliases:
+  CUSTOMER_OF: {relation: SUPPLIES, reverse: true}
+
+statuses: [active, planned, ceased, negated]
+
+strength_bases:
+  revenue_share: Share of the supplier's revenue that comes from this customer.
+  purchase_share: Share of the buyer's purchases of this input that come from this supplier.
+  output_share: Share of the producer's output committed to this buyer or produced at this facility.
+  ownership_share: Equity ownership percentage.
+  cost_share: Share of the buyer's cost of goods sold that this input represents.
+  amount_ratio: Disclosed amount relative to the recipient's revenue or project cost.
+  sole_source: Sole, single or limited source with no percentage (fixed strength 0.5).
