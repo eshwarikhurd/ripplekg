@@ -63,6 +63,22 @@ def cmd_coverage(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_events_check(args: argparse.Namespace) -> int:
+    from ripplekg.events import assign_split, load_events
+
+    events = load_events()
+    expected = assign_split(events)
+    for e in sorted(events, key=lambda e: (e.bucket != "primary", e.split or "", e.day0)):
+        print(f"{e.day0}  {e.bucket:7} {e.split or '-':4} {e.origin_kind:11} {e.id}")
+    mismatched = [e.id for e in events if e.bucket == "primary" and e.split != expected[e.id]]
+    if mismatched:
+        print(f"\nsplit differs from the pre-registered assignment: {', '.join(mismatched)}", file=sys.stderr)
+        return 1
+    n_primary = sum(e.bucket == "primary" for e in events)
+    print(f"\n{len(events)} events valid ({n_primary} primary); split matches pre-registration")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -78,6 +94,9 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("coverage", help="week-1 go/no-go: co-mention density via EDGAR full-text search")
     window(p)
     p.set_defaults(func=cmd_coverage)
+
+    p = sub.add_parser("events-check", help="validate config/events.yaml and the pre-registered split")
+    p.set_defaults(func=cmd_events_check)
     return parser
 
 
