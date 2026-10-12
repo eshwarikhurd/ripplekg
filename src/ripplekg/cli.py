@@ -194,6 +194,114 @@ def cmd_chunk(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pilot(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from ripplekg.extraction_run import ANNUAL_FORMS, run_extraction, sample_chunks, write_pilot_report
+    from ripplekg.llm import ClaudeProvider, OllamaProvider, ResponseCache
+    from ripplekg.ontology import load_ontology
+
+    chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
+    stage = chunks[chunks["form"].isin(ANNUAL_FORMS) & (chunks["families"].map(len) > 0)]
+    sample = sample_chunks(stage, args.sample, args.seed)
+    if args.provider == "ollama":
+        model = args.model if args.model != "claude-haiku-5-5" else "qwen2.5:7b"
+        provider = OllamaProvider(model=model)
+        workers = 1  # one local model: parallel requests only queue
+    else:
+        provider = ClaudeProvider(model=args.model, effort=args.effort)
+        workers = 4
+    cache = ResponseCache(settings.DATA_DIR / "extractions" / "cache")
+    res = run_extraction(
+        sample,
+        provider,
+        cache,
+        load_ontology(),
+        load_universe(),
+        workers=workers,
+        progress=lambda m: print(m, flush=True),
+    )
+    out = settings.RESULTS_DIR / "pilot" / args.provider
+    out.mkdir(parents=True, exist_ok=True)
+    res.outcomes.to_parquet(out / "outcomes.parquet", index=False)
+    res.edges.to_parquet(out / "edges.parquet", index=False)
+    full_calls = int(stage["families"].map(len).sum())
+    print(write_pilot_report(out / "pilot.md", res, len(sample), full_calls, provider.model))
+    print(f"\nfull report: {(out / 'pilot.md').relative_to(settings.ROOT)}")
+    return 0
+
+
+def cmd_gold(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from ripplekg import gold
+
+    folder = settings.RESULTS_DIR / "gold"
+    if args.action == "sheet":
+        pilot = settings.RESULTS_DIR / "pilot"
+        edges = {d.name: pd.read_parquet(d / "edges.parquet") for d in sorted(pilot.iterdir()) if d.is_dir()}
+        chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
+        sheet, key = gold.build_sheet(edges, chunks, args.per_model, args.seed)
+        sheet_path, _ = gold.write_sheet(sheet, key, folder)
+        print(f"{len(sheet)} edges from {', '.join(edges)} -> {sheet_path.relative_to(settings.ROOT)}")
+        print("Fill the `label` column with Y, N or ?, then run: ripplekg gold score")
+    else:
+        labels = pd.read_csv(folder / "label_sheet.csv")
+        print(gold.score(labels, pd.read_csv(folder / "key.csv")).to_string(index=False))
+    return 0
+
+
+STAGES = {"annual": {"10-K", "20-F", "40-F"}, "10-q": {"10-Q"}, "8-k": {"8-K"}}
+
+
+def cmd_extract(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from ripplekg import batch
+    from ripplekg.extraction_run import run_extraction
+    from ripplekg.llm import ClaudeProvider, ResponseCache
+    from ripplekg.ontology import load_ontology
+
+    chunks = pd.read_parquet(settings.DATA_DIR / "chunks" / "chunks.parquet")
+    stage = chunks[chunks["form"].isin(STAGES[args.stage]) & (chunks["families"].map(len) > 0)]
+    provider = ClaudeProvider(model=args.model, effort=args.effort)
+    cache = ResponseCache(settings.DATA_DIR / "extractions" / "cache")
+    state = settings.DATA_DIR / "extractions" / "batches.json"
+    ont, universe = load_ontology(), load_universe()
+
+    if args.action == "submit":
+        jobs, n_cached = batch.prepare_jobs(stage, provider, cache, ont, universe)
+        print(f"{len(stage):,} chunks: {n_cached:,} calls already cached, {len(jobs):,} to submit")
+        batch.submit(provider.client, jobs, state)
+    elif args.action == "status":
+        for row in batch.status(provider.client, state):
+            print(row)
+    elif args.action == "collect":
+        totals = batch.collect(provider.client, cache, state)
+        print(
+            f"collected {totals['succeeded']:,} results (${totals['cost_usd']:.2f}), "
+            f"{totals['failed']} failed, {totals['batches_waiting']} batches still running"
+        )
+    elif args.action == "run":
+        jobs, _ = batch.prepare_jobs(stage, provider, cache, ont, universe)
+        if jobs and not args.allow_live:
+            print(
+                f"{len(jobs):,} calls are not cached yet: submit and collect a batch first, "
+                "or pass --allow-live to pay full price for them now",
+                file=sys.stderr,
+            )
+            return 1
+        res = run_extraction(stage, provider, cache, ont, universe, progress=lambda m: print(m, flush=True))
+        out = settings.DATA_DIR / "extractions" / args.stage
+        out.mkdir(parents=True, exist_ok=True)
+        res.outcomes.to_parquet(out / "outcomes.parquet", index=False)
+        res.edges.to_parquet(out / "edges.parquet", index=False)
+        e = res.edges
+        print(f"{len(res.outcomes):,} calls, {len(e):,} edges, {int(e['ok'].sum()):,} verified")
+        print(f"wrote {out.relative_to(settings.ROOT)}/edges.parquet")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="ripplekg", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -231,6 +339,30 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("chunk", help="deduplicate, chunk and pre-filter documents; estimate LLM cost")
     p.set_defaults(func=cmd_chunk)
+
+    p = sub.add_parser(
+        "pilot", help="extract a small sample of annual-report chunks and report cost and quality"
+    )
+    p.add_argument("--sample", type=int, default=50, help="number of chunks")
+    p.add_argument("--seed", type=int, default=7)
+    p.add_argument("--model", default="claude-haiku-5-5")
+    p.add_argument("--effort", default="low", choices=["low", "medium", "high"])
+    p.add_argument("--provider", default="claude", choices=["claude", "ollama"])
+    p.set_defaults(func=cmd_pilot)
+
+    p = sub.add_parser("extract", help="bulk extraction through the Batch API: submit, status, collect, run")
+    p.add_argument("action", choices=["submit", "status", "collect", "run"])
+    p.add_argument("--stage", default="annual", choices=sorted(STAGES))
+    p.add_argument("--model", default="claude-haiku-5-5")
+    p.add_argument("--effort", default="low", choices=["low", "medium", "high"])
+    p.add_argument("--allow-live", action="store_true", help="run: pay full price for calls not yet cached")
+    p.set_defaults(func=cmd_extract)
+
+    p = sub.add_parser("gold", help="blind labelling sheet for pilot edges, and precision per model")
+    p.add_argument("action", choices=["sheet", "score"])
+    p.add_argument("--per-model", type=int, default=60)
+    p.add_argument("--seed", type=int, default=11)
+    p.set_defaults(func=cmd_gold)
     return parser
 
 
