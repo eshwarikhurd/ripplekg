@@ -232,6 +232,39 @@ def cmd_pilot(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_curate(args: argparse.Namespace) -> int:
+    import yaml
+
+    from ripplekg.explore.data import available_runs, load_run
+    from ripplekg.extraction.llm import ClaudeProvider, ResponseCache
+    from ripplekg.ontology import curation
+    from ripplekg.ontology.schema import load_ontology
+
+    ont = load_ontology()
+    run = next(r for r in available_runs() if r.id == args.run)
+    triples = load_run(run, ont)
+    groups = curation.collect_groups(triples, ont, args.min_count)
+    suggestions = curation.fuzzy_suggestions(groups, ont)
+    generic = [g for g in groups if curation.is_generic(g.label)]
+    to_triage = [g for g in groups if not curation.is_generic(g.label)]
+    print(f"{len(groups)} name groups seen >= {args.min_count} times: {len(generic)} generic (rule), "
+          f"{len(to_triage)} for LLM triage, {len(suggestions)} with a fuzzy match")  # fmt: skip
+    provider = ClaudeProvider(model=args.model, effort="low")
+    decisions, cost = curation.triage(
+        to_triage, suggestions, ont, provider, ResponseCache(settings.DATA_DIR / "curation" / "cache")
+    )
+    draft = curation.build_draft(groups, suggestions, decisions, ont)
+    out = settings.CONFIG_DIR / "curation" / f"{args.round}.yaml"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    body = yaml.safe_dump(draft, sort_keys=False, allow_unicode=True, width=110)
+    out.write_text(curation.DRAFT_HEADER.format(round=args.round) + "\n" + body)
+    counts = {k: len(v) for k, v in draft.items()}
+    approved = sum(e.get("approve", False) for v in draft.values() for e in v)
+    print(f"LLM cost: ${cost:.4f}; draft: {counts}; pre-approved (confidence >= 0.8): {approved}")
+    print(f"review {out.relative_to(settings.ROOT)}, then run: ripplekg curate apply {args.round}")
+    return 0
+
+
 def cmd_gold(args: argparse.Namespace) -> int:
     import pandas as pd
 
@@ -364,6 +397,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--per-model", type=int, default=60)
     p.add_argument("--seed", type=int, default=11)
     p.set_defaults(func=cmd_gold)
+
+    p = sub.add_parser("curate", help="draft node curation from unresolved names (review before applying)")
+    p.add_argument("action", choices=["draft"])
+    p.add_argument("--round", default="round1")
+    p.add_argument("--run", default="v1-annual")
+    p.add_argument("--min-count", type=int, default=3)
+    p.add_argument("--model", default="claude-haiku-5-5")
+    p.set_defaults(func=cmd_curate)
     return parser
 
 
