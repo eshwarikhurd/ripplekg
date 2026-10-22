@@ -9,6 +9,8 @@ import yaml
 
 from ripplekg.settings import CONFIG_DIR
 
+LISTINGS = {"public", "private", "jv", "subsidiary"}
+
 TIERS = {
     "miner_refiner",
     "diversified_miner",
@@ -30,6 +32,9 @@ class Company:
     listed_until: str | None = None
     successor: str | None = None
     notes: str = ""
+    home_ticker: str | None = None  # main home-exchange listing, Yahoo-style (300750.SZ, 6752.T)
+    other_tickers: tuple[str, ...] = ()
+    listing: str = "public"  # public | private | jv | subsidiary
 
     @property
     def is_filer(self) -> bool:
@@ -65,6 +70,9 @@ def parse_universe(raw: dict) -> Universe:
                 listed_until=row.get("listed_until"),
                 successor=row.get("successor"),
                 notes=row.get("notes", ""),
+                home_ticker=row.get("home_ticker"),
+                other_tickers=tuple(row.get("other_tickers", [])),
+                listing=row.get("listing", "public"),
             )
         except KeyError as exc:
             errors.append(f"{row.get('id', row)}: missing field {exc}")
@@ -75,6 +83,13 @@ def parse_universe(raw: dict) -> Universe:
             errors.append(f"{c.id}: search_names is empty")
         if c.ticker and not c.is_filer:
             errors.append(f"{c.id}: has a ticker but no cik")
+        if c.listing not in LISTINGS:
+            errors.append(f"{c.id}: listing {c.listing!r} not in {sorted(LISTINGS)}")
+        for t in (c.home_ticker, *c.other_tickers):
+            if t is not None and not isinstance(t, str):
+                errors.append(f"{c.id}: ticker {t!r} must be a string (quote it in YAML)")
+        if c.listing != "public" and c.home_ticker:
+            errors.append(f"{c.id}: a {c.listing} company has no home ticker")
         companies.append(c)
 
     by_id: dict[str, Company] = {}

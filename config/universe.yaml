@@ -7,6 +7,11 @@
 # search_names are exact phrases for EDGAR full-text search. Avoid bare words that
 # also have ordinary meanings (for example "Ford", "Vale", "Lucid").
 #
+# Non-US companies: `ticker` stays empty (it means a US listing with SEC filings); `home_ticker` is
+# the main home-exchange listing in Yahoo-style form (300750.SZ, 6752.T, BMW.DE), `other_tickers`
+# any further listings, `listing` one of public | private | jv | subsidiary. Every home ticker was
+# checked against an exchange or data-provider source on 2026-10-21.
+#
 # tiers: miner_refiner | diversified_miner | materials_components | cells_storage | recycler | automaker
 # CIKs come from SEC's company_tickers.json or, for delisted companies, from EDGAR
 # full-text search display names. `ripplekg universe check` re-validates them.
@@ -78,26 +83,26 @@ companies:
   - {id: LI, name: Li Auto, tier: automaker, cik: 1791706, ticker: LI, search_names: ["Li Auto"]}
   - {id: PSNY, name: Polestar, tier: automaker, cik: 1884082, ticker: PSNY, search_names: ["Polestar"]}
 
-  # Non-filers: graph nodes only
-  - {id: CATL, name: CATL, tier: cells_storage, search_names: ["Contemporary Amperex", "CATL"]}
-  - {id: LGES, name: LG Energy Solution, tier: cells_storage, search_names: ["LG Energy Solution"]}
-  - {id: LGCHEM, name: LG Chem, tier: materials_components, search_names: ["LG Chem"]}
-  - {id: PANASONIC, name: Panasonic, tier: cells_storage, search_names: ["Panasonic"]}
-  - {id: SKON, name: SK On, tier: cells_storage, search_names: ["SK On", "SK Innovation"]}
-  - {id: SDI, name: Samsung SDI, tier: cells_storage, search_names: ["Samsung SDI"]}
-  - {id: BYD, name: BYD, tier: automaker, search_names: ["BYD"]}
-  - {id: GANFENG, name: Ganfeng Lithium, tier: miner_refiner, search_names: ["Ganfeng"]}
-  - {id: TIANQI, name: Tianqi Lithium, tier: miner_refiner, search_names: ["Tianqi"]}
-  - {id: UMICORE, name: Umicore, tier: materials_components, search_names: ["Umicore"]}
-  - {id: ECOPRO, name: EcoPro, tier: materials_components, search_names: ["EcoPro"]}
-  - {id: HUAYOU, name: Zhejiang Huayou Cobalt, tier: materials_components, search_names: ["Huayou"]}
-  - {id: GLENCORE, name: Glencore, tier: diversified_miner, search_names: ["Glencore"]}
-  - {id: NORTHVOLT, name: Northvolt, tier: cells_storage, search_names: ["Northvolt"]}
-  - {id: REDWOOD, name: Redwood Materials, tier: recycler, search_names: ["Redwood Materials"]}
-  - {id: ASCEND, name: Ascend Elements, tier: recycler, search_names: ["Ascend Elements"]}
-  - {id: ULTIUM, name: Ultium Cells (GM–LGES JV), tier: cells_storage, search_names: ["Ultium Cells"]}
-  - {id: BLUEOVALSK, name: BlueOval SK (Ford–SK On JV), tier: cells_storage, search_names: ["BlueOval SK"]}
-  - {id: VW, name: Volkswagen, tier: automaker, search_names: ["Volkswagen"]}
-  - {id: HYUNDAI, name: Hyundai Motor, tier: automaker, search_names: ["Hyundai Motor"]}
-  - {id: BMW, name: BMW, tier: automaker, search_names: ["BMW"]}
-  - {id: MERCEDES, name: Mercedes-Benz, tier: automaker, search_names: ["Mercedes-Benz", "Daimler"]}
+  # Non-filers: graph nodes only (IDs stay readable; tickers in home_ticker)
+  - {id: CATL, name: CATL, tier: cells_storage, search_names: ["Contemporary Amperex", "CATL"], home_ticker: 300750.SZ, listing: public}
+  - {id: LGES, name: LG Energy Solution, tier: cells_storage, search_names: ["LG Energy Solution"], home_ticker: 373220.KS, listing: public}
+  - {id: LGCHEM, name: LG Chem, tier: materials_components, search_names: ["LG Chem"], home_ticker: 051910.KS, listing: public}
+  - {id: PANASONIC, name: Panasonic, tier: cells_storage, search_names: ["Panasonic"], home_ticker: 6752.T, listing: public}
+  - {id: SKON, name: SK On, tier: cells_storage, search_names: ["SK On", "SK Innovation"], listing: subsidiary, notes: "Unlisted battery subsidiary of SK Innovation (096770.KS)."}
+  - {id: SDI, name: Samsung SDI, tier: cells_storage, search_names: ["Samsung SDI"], home_ticker: 006400.KS, listing: public}
+  - {id: BYD, name: BYD, tier: automaker, search_names: ["BYD"], home_ticker: 002594.SZ, other_tickers: [1211.HK], listing: public}
+  - {id: GANFENG, name: Ganfeng Lithium, tier: miner_refiner, search_names: ["Ganfeng"], home_ticker: 002460.SZ, other_tickers: [1772.HK], listing: public}
+  - {id: TIANQI, name: Tianqi Lithium, tier: miner_refiner, search_names: ["Tianqi"], home_ticker: 002466.SZ, other_tickers: [9696.HK], listing: public}
+  - {id: UMICORE, name: Umicore, tier: materials_components, search_names: ["Umicore"], home_ticker: UMI.BR, listing: public}
+  - {id: ECOPRO, name: EcoPro, tier: materials_components, search_names: ["EcoPro"], home_ticker: 086520.KQ, listing: public}
+  - {id: HUAYOU, name: Zhejiang Huayou Cobalt, tier: materials_components, search_names: ["Huayou"], home_ticker: 603799.SS, listing: public}
+  - {id: GLENCORE, name: Glencore, tier: diversified_miner, search_names: ["Glencore"], home_ticker: GLEN.L, listing: public}
+  - {id: NORTHVOLT, name: Northvolt, tier: cells_storage, search_names: ["Northvolt"], listing: private}
+  - {id: REDWOOD, name: Redwood Materials, tier: recycler, search_names: ["Redwood Materials"], listing: private}
+  - {id: ASCEND, name: Ascend Elements, tier: recycler, search_names: ["Ascend Elements"], listing: private}
+  - {id: ULTIUM, name: Ultium Cells (GM–LGES JV), tier: cells_storage, search_names: ["Ultium Cells"], listing: jv, notes: "Joint venture of GM and LG Energy Solution."}
+  - {id: BLUEOVALSK, name: BlueOval SK (Ford–SK On JV), tier: cells_storage, search_names: ["BlueOval SK"], listing: jv, notes: "Joint venture of Ford and SK On."}
+  - {id: VW, name: Volkswagen, tier: automaker, search_names: ["Volkswagen"], home_ticker: VOW3.DE, other_tickers: [VOW.DE], listing: public}
+  - {id: HYUNDAI, name: Hyundai Motor, tier: automaker, search_names: ["Hyundai Motor"], home_ticker: 005380.KS, listing: public}
+  - {id: BMW, name: BMW, tier: automaker, search_names: ["BMW"], home_ticker: BMW.DE, listing: public}
+  - {id: MERCEDES, name: Mercedes-Benz, tier: automaker, search_names: ["Mercedes-Benz", "Daimler"], home_ticker: MBG.DE, listing: public}

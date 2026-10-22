@@ -47,3 +47,24 @@ def test_validation_errors(rows, message):
 def test_missing_field_is_reported():
     with pytest.raises(UniverseError, match="missing field 'tier'"):
         parse_universe({"companies": [{"id": "A", "name": "A", "search_names": ["A"]}]})
+
+
+def test_non_us_companies_have_verified_home_tickers():
+    u = load_universe()
+    assert u.by_id["CATL"].home_ticker == "300750.SZ"
+    assert u.by_id["BYD"].other_tickers == ("1211.HK",)
+    assert u.by_id["NORTHVOLT"].listing == "private" and u.by_id["NORTHVOLT"].home_ticker is None
+    assert u.by_id["TSLA"].listing == "public" and u.by_id["TSLA"].home_ticker is None
+
+
+@pytest.mark.parametrize(
+    ("extra", "message"),
+    [
+        ({"listing": "unicorn"}, "listing 'unicorn'"),
+        ({"cik": None, "ticker": None, "listing": "private", "home_ticker": "X.DE"}, "has no home ticker"),
+        ({"cik": None, "ticker": None, "home_ticker": 6752}, "must be a string"),
+    ],
+)
+def test_listing_validation(extra, message):
+    with pytest.raises(UniverseError, match=message):
+        parse_universe({"companies": [row(**extra)]})
