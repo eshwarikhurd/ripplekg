@@ -1,0 +1,1841 @@
+# Reviewer corrections for round 1, applied on top of the model's triage when the draft is built.
+# Each correction changes one name group and records why (`note`).
+
+add_nodes:
+- kind: region
+  id: US-UT
+  label: Utah
+  parent: United States
+  note: Needed for facilities (White Mesa Mill, Kennecott).
+- kind: region
+  id: US-AL
+  label: Alabama
+  parent: United States
+  note: Needed for facilities (Kellyton, Coosa, Alabama Spoke).
+- kind: region
+  id: US-CO
+  label: Colorado
+  parent: United States
+  note: Needed for Colorado facilities.
+- kind: region
+  id: US-SC
+  label: South Carolina
+  parent: United States
+  note: Needed for the Volvo/Polestar plant.
+- kind: region
+  id: CA-ON
+  label: Ontario
+  parent: Canada
+  note: Needed for Sudbury, Port Colborne, Ontario Spoke.
+- kind: region
+  id: CA-MB
+  label: Manitoba
+  parent: Canada
+  note: Needed for Thompson.
+- kind: region
+  id: CA-NL
+  label: Newfoundland and Labrador
+  parent: Canada
+  note: Needed for Voisey's Bay and Long Harbour.
+- kind: region
+  id: MN
+  label: Mongolia
+  note: Needed for Oyu Tolgoi.
+- kind: region
+  id: PE
+  label: Peru
+  note: Needed for Antamina and La Granja.
+- kind: region
+  id: RS
+  label: Serbia
+  note: Needed for Jadar.
+- kind: region
+  id: GH
+  label: Ghana
+  note: Needed for Ewoyaa.
+- kind: region
+  id: MY
+  label: Malaysia
+  note: Needed for Enovix Fab2.
+- kind: region
+  id: IT
+  label: Italy
+  note: Needed for the Portovesme hub.
+- kind: region
+  id: GB
+  label: United Kingdom
+  note: Needed for Clydach.
+- kind: region
+  id: NC
+  label: New Caledonia
+  note: Needed for Vale's VNC plant.
+- kind: region
+  id: EE
+  label: Estonia
+  note: Needed for Silmet.
+- kind: authority
+  id: US-GOV
+  label: US Government
+  aliases:
+  - U.S. government
+  - United States government
+  - U.S. federal government
+  note: Generic US government, as used in filings.
+- kind: region
+  id: MG
+  label: Madagascar
+  note: Needed for Toliara.
+- kind: region
+  id: BG
+  label: Bulgaria
+  note: Needed for EnerSys's Targovishte plant.
+corrections:
+- key: pt fi
+  set:
+    action: new
+    kind: company
+    label: PT Freeport Indonesia
+    parent: FCX
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: PT-FI is the FCX subsidiary that operates Grasberg (a company, not the mine).
+- key: lithium nevada
+  set:
+    action: new
+    kind: company
+    label: Lithium Nevada
+    parent: LAC
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Lithium Nevada Corp. is the Lithium Americas subsidiary that owns Thacker Pass; it is a company, not the
+    mine.
+- key: fremont factory
+  set:
+    action: new
+    kind: facility
+    label: Fremont Factory
+    parent: TSLA
+    region: California
+    battery_relevant: true
+    approve: true
+  note: Tesla's Fremont, California vehicle factory; a different plant from Gigafactory Nevada.
+- key: u s government
+  set:
+    action: alias
+    existing: US Government
+    approve: true
+  note: Generic 'U.S. government' is not the Department of Commerce; mapped to a new US Government authority.
+- key: united states government
+  set:
+    action: alias
+    existing: US Government
+    approve: true
+  note: Same as 'U.S. government'.
+- key: panasonic energy
+  set:
+    action: new
+    kind: company
+    label: Panasonic Energy
+    parent: PANASONIC
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Panasonic's battery subsidiary; kept as its own node under your separate-subsidiary rule.
+- key: arizona spoke
+  set:
+    action: new
+    kind: facility
+    label: Arizona Spoke
+    parent: LICY
+    region: Arizona
+    battery_relevant: true
+    approve: true
+  note: Li-Cycle recycling facility in Arizona, not the company itself.
+- key: alabama spoke
+  set:
+    action: new
+    kind: facility
+    label: Alabama Spoke
+    parent: LICY
+    region: Alabama
+    battery_relevant: true
+    approve: true
+  note: Li-Cycle recycling facility in Alabama, not the company itself.
+- key: allkem
+  set:
+    action: new
+    kind: company
+    label: Allkem
+    parent: ''
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Allkem merged with Livent into Arcadium in January 2024; kept as its own (predecessor) company for pre-2024
+    filings.
+- key: piedmont
+  set:
+    action: alias
+    existing: PLL
+    approve: true
+  note: In Elevra filings 'Piedmont' is Piedmont Lithium (PLL), which merged into Elevra; not Elevra itself.
+- key: green lithium
+  set:
+    action: skip
+    approve: true
+  note: '''Green Lithium'' is Sigma Lithium''s product brand for its concentrate, not a separate material.'
+- key: carmen lithium production
+  set:
+    action: alias
+    existing: Salar del Carmen
+    approve: true
+  note: SQM's Carmen lithium plant is at Salar del Carmen, not Albemarle's Kemerton plant.
+- key: bhp brasil
+  set:
+    action: new
+    kind: company
+    label: BHP Brasil
+    parent: BHP
+    region: ''
+    battery_relevant: true
+    approve: false
+  note: BHP subsidiary (Samarco partner); separate node under your subsidiary rule.
+- key: bauxite
+  set:
+    action: skip
+    approve: true
+  note: Bauxite is aluminium ore, not the aluminum material; off-topic for the battery chain.
+- key: strathmore minerals
+  set:
+    action: skip
+    approve: true
+  note: Uranium company acquired by Energy Fuels; off-topic for the battery chain.
+- key: ndpr metal
+  set:
+    action: new
+    kind: material
+    label: NdPr metal
+    parent: Rare earth elements
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: NdPr metal is a downstream product of NdPr oxide, not the same material.
+- key: ultium cells
+  set:
+    approve: true
+  note: Right node (the GM-LGES joint venture company); flagged only because the name appeared in a facility position.
+- key: gigafactory 2
+  set:
+    action: alias
+    existing: Gigafactory New York
+    approve: true
+  note: Gigafactory 2 is Tesla's Buffalo, New York plant, not Gigafactory Nevada.
+- key: sociedad quimica y minera sqm
+  set:
+    approve: true
+  note: Right node (SQM's legal name); flagged only because of the position it appeared in.
+- key: existing operations in argentina
+  set:
+    action: skip
+    approve: true
+  note: A description ('existing operations in Argentina'), not a named facility; Salar de Atacama is in Chile.
+- key: ecopro bm
+  set:
+    action: new
+    kind: company
+    label: EcoPro BM
+    parent: ECOPRO
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: EcoPro's separately listed cathode subsidiary; ticker to verify.
+- key: tesla factory
+  set:
+    action: alias
+    existing: Fremont Factory
+    approve: true
+  note: '''Tesla Factory'' in Tesla filings is the Fremont factory, not the company.'
+- key: doe
+  set:
+    approve: true
+  note: Right node (US Department of Energy); flagged only because DOE appeared where a program was expected.
+- key: american battery technology abat
+  set:
+    approve: true
+  note: Right node (the filer itself).
+- key: arcadium lithium
+  set:
+    approve: true
+  note: Right node (ALTM, Arcadium Lithium).
+- key: united states
+  set:
+    approve: true
+  note: Right node (the United States region).
+- key: former lac
+  set:
+    action: alias
+    existing: LAR
+    approve: true
+  note: '''Former LAC'' in Lithium Argentina filings is the pre-2023 Lithium Americas entity, which became Lithium
+    Argentina (LAR), not the new LAC.'
+- key: lgc
+  set:
+    action: alias
+    existing: LGCHEM
+    approve: true
+  note: In Li-Cycle filings LGC is LG Chem (an investor), not Glencore.
+- key: lg
+  set:
+    action: skip
+    approve: true
+  note: '''LG'' alone is ambiguous between LG Chem, LG Energy Solution and the LG group.'
+- key: cyberspace administration of china
+  set:
+    action: skip
+    approve: true
+  note: China's internet/data regulator, mentioned for data rules; off-topic for the battery chain.
+- key: anodes
+  set:
+    approve: false
+  note: Plausible, but RIO uses 'anodes' for aluminium smelting; check the quotes.
+- key: minera exar
+  set:
+    parent: LAR
+    approve: true
+  note: Minera Exar operates Cauchari-Olaroz and is a joint venture of Lithium Argentina (LAR) and Ganfeng; parent
+    is LAR, not the new LAC.
+- key: exar
+  set:
+    action: alias
+    existing: Minera Exar
+    approve: true
+  note: Short form of Minera Exar (mentioned by LAR); not a separate SQM/Ganfeng company.
+- key: exar capital b v
+  set:
+    parent: LAR
+    approve: true
+  note: Lithium Argentina's financing subsidiary for Cauchari-Olaroz; parent LAR.
+- key: millennial lithium
+  set:
+    parent: LAR
+    approve: true
+  note: Millennial Lithium was acquired by Lithium Americas in 2022 (that entity is now LAR), not by Liontown.
+- key: jupiter gold
+  set:
+    parent: ATLX
+    approve: false
+  note: Atlas Lithium affiliate (not Atlantic Lithium's); gold, so off-topic for the battery chain, but frequently
+    linked to ATLX.
+- key: ford
+  set:
+    action: alias
+    existing: F
+    approve: true
+  note: Ford Motor is already in the universe as F.
+- key: sayona
+  set:
+    action: alias
+    existing: ELVR
+    approve: true
+  note: Sayona Mining renamed itself Elevra Lithium (ELVR).
+- key: jiangxi ganfeng lithium
+  set:
+    action: alias
+    existing: GANFENG
+    approve: true
+  note: Full legal name of Ganfeng Lithium.
+- key: bhp billiton
+  set:
+    action: alias
+    existing: BHP
+    approve: true
+  note: Former name of BHP.
+- key: bhp uk
+  set:
+    action: alias
+    existing: BHP
+    approve: true
+  note: BHP Group Plc, the former UK half of BHP's dual listing.
+- key: samsung electronics
+  set:
+    label: Samsung Electronics
+    approve: true
+  note: Samsung Electronics, not Samsung SDI.
+- key: prime planet energy solutions
+  set:
+    label: Prime Planet Energy
+    parent: TM
+    approve: true
+  note: Toyota (51%) and Panasonic joint venture.
+- key: ppes
+  set:
+    action: alias
+    existing: Prime Planet Energy
+    approve: true
+  note: PPES is Prime Planet Energy & Solutions.
+- key: ptvi
+  set:
+    parent: VALE
+    approve: true
+  note: PT Vale Indonesia is majority-owned by Vale.
+- key: samarco
+  set:
+    parent: VALE
+    approve: false
+  note: Iron ore joint venture of Vale and BHP; off-topic for the battery chain but important to both. Your call.
+- key: samarco mineracao
+  set:
+    action: alias
+    existing: Samarco
+    approve: true
+  note: Same company as Samarco.
+- key: simfer
+  set:
+    action: skip
+    approve: true
+  note: Iron ore (Simandou) joint venture of Rio Tinto; off-topic for the battery chain.
+- key: simfer jersey
+  set:
+    action: skip
+    approve: true
+  note: Iron ore (Simandou) holding company of Rio Tinto; off-topic for the battery chain.
+- key: mel
+  set:
+    action: alias
+    existing: Escondida
+    approve: true
+  note: MEL is Minera Escondida, the company operating Escondida; mapped to the mine.
+- key: equinor tdi
+  set:
+    label: Equinor
+    parent: ''
+    approve: true
+  note: Equinor's holding vehicle for its stake in Standard Lithium's projects; labelled as Equinor.
+- key: volkswagen of america investments
+  set:
+    label: VW Group of America
+    approve: true
+  note: Volkswagen subsidiary that held its QuantumScape stake.
+- key: nli
+  set:
+    action: alias
+    existing: Nemaska Lithium
+    approve: true
+  note: NLI is Nemaska Lithium Inc.
+- key: nemaska lithium shawinigan transformation
+  set:
+    label: Nemaska Lithium
+    parent: ALTM
+    approve: true
+  note: Nemaska Lithium (Quebec), a joint venture of Livent/Arcadium and Investissement Québec.
+- key: iq
+  set:
+    label: Investissement Québec
+    approve: true
+  note: IQ is Investissement Québec, Nemaska's government co-owner.
+- key: strathmore
+  set:
+    action: skip
+    approve: true
+  note: Uranium company acquired by Energy Fuels; off-topic for the battery chain.
+- key: efr arizona strip
+  set:
+    action: skip
+    approve: true
+  note: Energy Fuels uranium/vanadium subsidiary; off-topic for the battery chain.
+- key: roca honda resources
+  set:
+    action: skip
+    approve: true
+  note: Energy Fuels uranium subsidiary; off-topic for the battery chain.
+- key: efr henry mountains
+  set:
+    action: skip
+    approve: true
+  note: Energy Fuels uranium subsidiary; off-topic for the battery chain.
+- key: adur madencilik sirketi
+  set:
+    action: skip
+    approve: true
+  note: Westwater's Turkish uranium subsidiary; off-topic for the battery chain.
+- key: richards bay minerals rbm
+  set:
+    action: skip
+    approve: true
+  note: Titanium and zircon producer; off-topic for the battery chain.
+- key: qit madagascar minerals
+  set:
+    action: skip
+    approve: true
+  note: Ilmenite producer; off-topic for the battery chain.
+- key: richards bay mining proprietary
+  set:
+    action: skip
+    approve: true
+  note: Titanium and zircon producer; off-topic for the battery chain.
+- key: u s borax
+  set:
+    action: skip
+    approve: true
+  note: Borates; off-topic for the battery chain.
+- key: bcp innovation pte
+  set:
+    parent: ''
+    approve: false
+  note: Probably Bangchak's investment arm rather than Ganfeng-linked; check the quotes.
+- key: turquoise hill resources
+  set:
+    parent: RIO
+    approve: true
+  note: Copper miner (Oyu Tolgoi) majority-owned by Rio Tinto; copper is kept in scope.
+- key: talison lithium
+  set:
+    parent: Windfield Holdings
+    approve: true
+  note: Talison operates Greenbushes and is owned by Windfield Holdings.
+- key: iron ore
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: iron ore pellets
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: potassium chloride
+  set:
+    action: skip
+    approve: true
+  note: SQM fertilizer line; off-topic for the battery chain.
+- key: potassium nitrate
+  set:
+    action: skip
+    approve: true
+  note: SQM fertilizer line; off-topic for the battery chain.
+- key: potassium sulfate
+  set:
+    action: skip
+    approve: true
+  note: SQM fertilizer line; off-topic for the battery chain.
+- key: iodine
+  set:
+    action: skip
+    approve: true
+  note: SQM iodine line; off-topic for the battery chain.
+- key: metallurgical coal
+  set:
+    action: skip
+    approve: true
+  note: Coal; off-topic for the battery chain.
+- key: alumina
+  set:
+    action: skip
+    approve: true
+  note: Aluminium intermediate; off-topic for the battery chain.
+- key: boron
+  set:
+    action: skip
+    approve: true
+  note: Borates; off-topic for the battery chain.
+- key: tellurium
+  set:
+    action: skip
+    approve: true
+  note: Solar by-product; off-topic for the battery chain.
+- key: scandium oxide
+  set:
+    action: skip
+    approve: true
+  note: off-topic for the battery chain.
+- key: alternate feed materials
+  set:
+    action: skip
+    approve: true
+  note: Uranium mill feed; off-topic for the battery chain.
+- key: manganese ferroalloys
+  set:
+    action: skip
+    approve: true
+  note: Steel input; off-topic for the battery chain.
+- key: green by products
+  set:
+    action: skip
+    approve: true
+  note: Tailings by-product, not a named material.
+- key: carbonates
+  set:
+    action: skip
+    approve: true
+  note: Too generic ('carbonates').
+- key: high purity lithium metal
+  set:
+    action: alias
+    existing: Lithium metal
+    approve: true
+  note: A grade of lithium metal.
+- key: monazite sands
+  set:
+    action: alias
+    existing: Monazite
+    approve: true
+  note: Monazite sands are the monazite feedstock.
+- key: re carbonate
+  set:
+    label: Mixed rare earth carbonate
+    parent: Rare earth elements
+    approve: true
+  note: Mixed rare earth carbonate made by Energy Fuels.
+- key: mixed re carbonate
+  set:
+    action: alias
+    existing: Mixed rare earth carbonate
+    approve: true
+  note: Same product.
+- key: ree carbonate
+  set:
+    action: alias
+    existing: Mixed rare earth carbonate
+    approve: true
+  note: Same product.
+- key: mixed ree carbonate
+  set:
+    action: alias
+    existing: Mixed rare earth carbonate
+    approve: true
+  note: Same product.
+- key: caustic soda
+  set:
+    action: alias
+    existing: Sodium hydroxide
+    approve: true
+  note: Caustic soda is sodium hydroxide.
+- key: lithium sulphate
+  set:
+    action: alias
+    existing: Lithium sulfate
+    approve: true
+  note: British spelling of lithium sulfate.
+- key: copper matte
+  set:
+    action: alias
+    existing: Copper
+    approve: true
+  note: An intermediate form of copper.
+- key: refined cobalt
+  set:
+    action: alias
+    existing: Cobalt
+    approve: true
+  note: A refined form of cobalt.
+- key: refined nickel
+  set:
+    action: alias
+    existing: Nickel
+    approve: true
+  note: A refined form of nickel.
+- key: evaporated brine
+  set:
+    action: alias
+    existing: Lithium brine
+    approve: true
+  note: Concentrated lithium brine.
+- key: battery grade lithium concentrate
+  set:
+    action: alias
+    existing: Spodumene
+    approve: true
+  note: Sigma's lithium concentrate is spodumene concentrate.
+- key: synthetic graphite anode material
+  set:
+    action: alias
+    existing: Synthetic graphite
+    approve: true
+  note: NOVONIX's synthetic graphite anode material.
+- key: ultra cspgtm
+  set:
+    action: alias
+    existing: Coated spherical purified graphite
+    approve: true
+  note: ULTRA-CSPG is Westwater's coated spherical purified graphite.
+- key: ultra cspg
+  set:
+    action: alias
+    existing: Coated spherical purified graphite
+    approve: true
+  note: Same product.
+- key: silicon anode
+  set:
+    action: alias
+    existing: Silicon anode materials
+    approve: true
+  note: Same as silicon anode materials.
+- key: electrolyte material
+  set:
+    action: alias
+    existing: Electrolyte
+    approve: true
+  note: Generic electrolyte material.
+- key: powerwall
+  set:
+    action: skip
+    approve: true
+  note: Tesla product line, not a supply-chain component.
+- key: megapack
+  set:
+    action: skip
+    approve: true
+  note: Tesla product line, not a supply-chain component.
+- key: grasberg minerals district
+  set:
+    action: alias
+    existing: Grasberg
+    approve: true
+  note: The existing Grasberg facility.
+- key: jemse
+  set:
+    kind: company
+    approve: true
+  note: JEMSE is Jujuy's state-owned mining company (a Minera Exar shareholder), so a company.
+- key: corfo
+  set:
+    action: alias
+    existing: Government of Chile
+    approve: true
+  note: CORFO is already an alias of the Government of Chile node.
+- key: chilean nuclear energy commission
+  set:
+    action: alias
+    existing: CCHEN
+    approve: true
+  note: Same as CCHEN.
+- key: section 45x
+  set:
+    action: alias
+    existing: IRA 45X credit
+    approve: true
+  note: Existing node.
+- key: 45x credit
+  set:
+    action: alias
+    existing: IRA 45X credit
+    approve: true
+  note: Existing node.
+- key: atvm loan program
+  set:
+    action: alias
+    existing: DOE Loan Programs Office
+    approve: true
+  note: ATVM loans are run by the DOE Loan Programs Office.
+- key: 48c program
+  set:
+    action: alias
+    existing: IRA 48C credit
+    approve: true
+  note: Existing node.
+- key: white mesa mill
+  set:
+    action: new
+    kind: facility
+    label: White Mesa Mill
+    parent: UUUU
+    region: Utah
+    battery_relevant: true
+    approve: true
+  note: Energy Fuels' mill in Utah (uranium, vanadium and rare earths).
+- key: mill
+  set:
+    region: Utah
+    approve: true
+  note: '''the Mill'' in Energy Fuels filings is White Mesa Mill, in Utah.'
+- key: coosa
+  set:
+    approve: false
+  note: Unclear whether this is the Coosa graphite deposit or the Kellyton plant (both in Coosa County, Alabama);
+    check the quotes.
+- key: la sal
+  set:
+    action: skip
+    approve: true
+  note: Energy Fuels uranium complex; off-topic for the battery chain.
+- key: diavik
+  set:
+    action: skip
+    approve: true
+  note: Diamond mine; off-topic for the battery chain.
+- key: europe
+  set:
+    action: alias
+    existing: European Union
+    approve: true
+  note: Closest existing region node.
+- key: cbg sangaredi
+  set:
+    action: skip
+    approve: true
+  note: Bauxite mine; off-topic for the battery chain.
+- key: pilbara minerals
+  set:
+    action: new
+    kind: company
+    label: Pilbara Minerals
+    parent: ''
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Australian lithium producer (Pilgangoora); ticker to verify.
+- key: lanxess south
+  set:
+    action: alias
+    existing: DLE Demonstration Plant
+    approve: true
+  note: Standard Lithium's demonstration plant at LANXESS's south plant in Arkansas.
+- key: western australia iron ore waio
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: anglo american
+  set:
+    action: new
+    kind: company
+    label: Anglo American
+    parent: ''
+    region: ''
+    battery_relevant: true
+    approve: false
+  note: Diversified miner (nickel, PGMs, copper); ticker to verify.
+- key: lg chemical
+  set:
+    action: alias
+    existing: LGCHEM
+    approve: true
+  note: LG Chem.
+- key: cauchari olaroz lithium
+  set:
+    action: alias
+    existing: Cauchari-Olaroz
+    approve: true
+  note: Same project.
+- key: mt holland jv
+  set:
+    action: alias
+    existing: Mt Holland
+    approve: true
+  note: Same project.
+- key: government of argentina
+  set:
+    action: new
+    kind: authority
+    label: Government of Argentina
+    parent: ''
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Argentina's national government.
+- key: argentine government
+  set:
+    action: alias
+    existing: Government of Argentina
+    approve: true
+  note: Same authority.
+- key: qal
+  set:
+    action: skip
+    approve: true
+  note: Alumina refinery; off-topic for the battery chain.
+- key: italy
+  set:
+    action: alias
+    existing: Italy
+    approve: true
+  note: New region.
+- key: humboldt county nevada usa
+  set:
+    action: alias
+    existing: Nevada
+    approve: true
+  note: Humboldt County is in Nevada; county-level detail is not needed.
+- key: brighton colorado
+  set:
+    action: alias
+    existing: Colorado
+    approve: true
+  note: City in Colorado; mapped to the Colorado region.
+- key: northeastern brazil lithium
+  set:
+    action: alias
+    existing: Northeast Lithium Project
+    approve: true
+  note: Same Atlas Lithium project.
+- key: atlas brazil
+  set:
+    action: alias
+    existing: Atlas Litio Brasil
+    approve: true
+  note: Same Atlas subsidiary.
+- key: stanmore smc
+  set:
+    action: skip
+    approve: true
+  note: Coal; off-topic for the battery chain.
+- key: exide technologies stryten
+  set:
+    action: alias
+    existing: Exide Technologies
+    approve: true
+  note: Same battery maker.
+- key: province of jujuy
+  set:
+    action: new
+    kind: authority
+    label: Jujuy Province
+    parent: ''
+    region: ''
+    battery_relevant: true
+    approve: true
+  note: Argentine provincial government where Cauchari-Olaroz and Olaroz are.
+- key: north american spokes
+  set:
+    action: skip
+    approve: true
+  note: Generic group of Li-Cycle facilities.
+- key: posco esm
+  set:
+    action: alias
+    existing: PKX
+    approve: true
+  note: POSCO ESM was merged into POSCO Chemical (now POSCO Future M, part of PKX).
+- key: turquoise hill resources trq
+  set:
+    action: alias
+    existing: Turquoise Hill Resources
+    approve: true
+  note: Same company.
+- key: port of tocopilla
+  set:
+    action: alias
+    existing: Tocopilla Port
+    approve: true
+  note: Same port.
+- key: sg fines
+  set:
+    action: alias
+    existing: SPG Fines
+    approve: true
+  note: Same product.
+- key: millimeter wave radar
+  set:
+    action: skip
+    approve: true
+  note: Vehicle sensor; off-topic for the battery chain.
+- key: agp
+  set:
+    approve: false
+  note: Unclear abbreviation; check the quotes.
+- key: cauchari olaroz
+  set:
+    parent: LAR
+    approve: true
+  note: Operated by Minera Exar, the Lithium Argentina (LAR) and Ganfeng joint venture; parent LAR, not the new
+    LAC.
+- key: cauchari tr
+  set:
+    action: alias
+    existing: Cauchari-Olaroz
+    approve: true
+  note: Same project.
+- key: cauchari joint venture
+  set:
+    action: alias
+    existing: Cauchari-Olaroz
+    approve: true
+  note: Same project.
+- key: minera exar lithium
+  set:
+    action: alias
+    existing: Cauchari-Olaroz
+    approve: true
+  note: Minera Exar's lithium project is Cauchari-Olaroz.
+- key: pastos grandes
+  set:
+    parent: LAR
+    approve: true
+  note: Lithium Argentina's project (pre-split Lithium Americas); parent LAR.
+- key: oyu tolgoi
+  set:
+    region: Mongolia
+    approve: true
+  note: Region added.
+- key: oyu tolgoi underground
+  set:
+    action: alias
+    existing: Oyu Tolgoi
+    approve: true
+  note: Part of Oyu Tolgoi.
+- key: antamina
+  set:
+    region: Peru
+    approve: true
+  note: Region added.
+- key: resolution copper
+  set:
+    parent: RIO
+    approve: true
+  note: Rio Tinto (55%) operates it with BHP (45%).
+- key: carolina lithium
+  set:
+    parent: PLL
+    approve: true
+  note: Piedmont Lithium's project (now Elevra).
+- key: nal
+  set:
+    label: North American Lithium
+    parent: ELVR
+    region: Quebec
+    approve: true
+  note: North American Lithium, Sayona's (now Elevra's) Quebec operation.
+- key: north american lithium
+  set:
+    action: alias
+    existing: North American Lithium
+    approve: true
+  note: Same operation.
+- key: authier lithium
+  set:
+    parent: ELVR
+    approve: true
+  note: Elevra project.
+- key: kellyton graphite
+  set:
+    region: Alabama
+    approve: true
+  note: Kellyton is in Coosa County, Alabama.
+- key: kellyton graphite processing
+  set:
+    action: alias
+    existing: Kellyton Graphite Plant
+    approve: true
+  note: Same plant.
+- key: coosa graphite
+  set:
+    region: Alabama
+    approve: true
+  note: Coosa graphite deposit, Alabama.
+- key: coosa alabama
+  set:
+    action: alias
+    existing: Coosa Graphite Project
+    approve: true
+  note: Same project.
+- key: bahia
+  set:
+    parent: UUUU
+    approve: true
+  note: Energy Fuels' Bahia rare earth project in Brazil.
+- key: south west arkansas
+  set:
+    parent: SLI
+    approve: true
+  note: Standard Lithium project.
+- key: rhyolite ridge
+  set:
+    region: Nevada
+    approve: true
+  note: ioneer project in Nevada.
+- key: jansen potash
+  set:
+    action: skip
+    approve: true
+  note: Potash; off-topic for the battery chain.
+- key: jansen stage 2
+  set:
+    action: skip
+    approve: true
+  note: Potash; off-topic for the battery chain.
+- key: rincon lithium
+  set:
+    action: alias
+    existing: Rincon
+    approve: true
+  note: Same project.
+- key: rincon starter
+  set:
+    action: alias
+    existing: Rincon
+    approve: true
+  note: Part of Rincon.
+- key: jadar
+  set:
+    region: Serbia
+    approve: true
+  note: Region added.
+- key: jadar lithium borates
+  set:
+    action: alias
+    existing: Jadar Project
+    approve: true
+  note: Same project.
+- key: mt holland lithium
+  set:
+    label: Mt Holland
+    parent: SQM
+    approve: true
+  note: Covalent (SQM and Wesfarmers) project.
+- key: mt holland
+  set:
+    action: alias
+    existing: Mt Holland
+    approve: true
+  note: Same project.
+- key: mount holland
+  set:
+    action: alias
+    existing: Mt Holland
+    approve: true
+  note: Same project.
+- key: sheep mountain
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: nichols ranch
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: alta mesa
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: roca honda
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: pandora
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: daneros
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: whirlwind
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: canyon
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: efr colorado plateau
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: henry mountains
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: bullfrog
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: pinenut
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: temrezli
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: sefaatli
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: rosita
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: jabiluka
+  set:
+    action: skip
+    approve: true
+  note: Uranium; off-topic for the battery chain.
+- key: cerrejon
+  set:
+    action: skip
+    approve: true
+  note: Coal; off-topic for the battery chain.
+- key: iron ore of canada
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: simandou
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: carajas
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: serra norte
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: itabira
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: corrego do feijao
+  set:
+    action: skip
+    approve: true
+  note: Iron ore; off-topic for the battery chain.
+- key: gove
+  set:
+    action: skip
+    approve: true
+  note: Bauxite; off-topic for the battery chain.
+- key: queensland alumina qal
+  set:
+    action: skip
+    approve: true
+  note: Alumina; off-topic for the battery chain.
+- key: gladstone alumina refineries
+  set:
+    action: skip
+    approve: true
+  note: Alumina; off-topic for the battery chain.
+- key: jonquiere vaudreuil
+  set:
+    action: skip
+    approve: true
+  note: Aluminium; off-topic for the battery chain.
+- key: arvida smelter
+  set:
+    action: skip
+    approve: true
+  note: Aluminium; off-topic for the battery chain.
+- key: tiwai point
+  set:
+    action: skip
+    approve: true
+  note: Aluminium; off-topic for the battery chain.
+- key: richards bay minerals
+  set:
+    action: skip
+    approve: true
+  note: Titanium and zircon; off-topic for the battery chain.
+- key: qit madagascar minerals qmm
+  set:
+    action: skip
+    approve: true
+  note: Ilmenite; off-topic for the battery chain.
+- key: lac tio
+  set:
+    action: skip
+    approve: true
+  note: Titanium; off-topic for the battery chain.
+- key: burra tm scandium
+  set:
+    action: skip
+    approve: true
+  note: off-topic for the battery chain.
+- key: kwale
+  set:
+    action: skip
+    approve: true
+  note: Mineral sands (ilmenite); off-topic for the battery chain.
+- key: simoes filho
+  set:
+    action: skip
+    approve: true
+  note: Ferroalloys; off-topic for the battery chain.
+- key: minerals americas
+  set:
+    action: skip
+    approve: true
+  note: BHP business segment, not a facility.
+- key: volvo cars
+  set:
+    region: South Carolina
+    approve: false
+  note: Polestar builds at a Volvo Cars plant in South Carolina; the operator (Volvo Cars) is not a node yet.
+- key: qsv
+  set:
+    region: California
+    approve: true
+  note: QuantumScape, San Jose.
+- key: qs 1
+  set:
+    region: California
+    approve: true
+  note: QuantumScape's QS-1 line, San Jose.
+- key: amp 1
+  set:
+    region: Arizona
+    approve: true
+  note: Lucid's AMP-1 factory in Casa Grande, Arizona.
+- key: greentech
+  set:
+    region: Brazil
+    approve: true
+  note: Sigma Lithium's plant in Minas Gerais.
+- key: phase 1 greentech
+  set:
+    action: alias
+    existing: Greentech Plant
+    approve: true
+  note: Phase 1 of the same plant.
+- key: long harbour refinery
+  set:
+    action: alias
+    existing: Long Harbour
+    approve: true
+  note: Same site.
+- key: long harbour processing
+  set:
+    action: alias
+    existing: Long Harbour
+    approve: true
+  note: Same site.
+- key: long harbour
+  set:
+    region: Newfoundland and Labrador
+    approve: true
+  note: Region added.
+- key: port colborne processing
+  set:
+    label: Port Colborne
+    region: Ontario
+    approve: true
+  note: Vale's Port Colborne refinery, Ontario.
+- key: port colborne refinery
+  set:
+    action: alias
+    existing: Port Colborne
+    approve: true
+  note: Same site.
+- key: port colborne nickel refinery
+  set:
+    action: alias
+    existing: Port Colborne
+    approve: true
+  note: Same site.
+- key: port colborne
+  set:
+    action: alias
+    existing: Port Colborne
+    approve: true
+  note: Same site.
+- key: sudbury
+  set:
+    region: Ontario
+    approve: true
+  note: Region refined.
+- key: sudbury nickel
+  set:
+    action: alias
+    existing: Sudbury
+    approve: true
+  note: Same operations.
+- key: copper cliff nickel refinery
+  set:
+    action: alias
+    existing: Sudbury
+    approve: true
+  note: Part of the Sudbury operations.
+- key: copper cliff smelter
+  set:
+    action: alias
+    existing: Sudbury
+    approve: true
+  note: Part of the Sudbury operations.
+- key: clarabelle mill
+  set:
+    action: alias
+    existing: Sudbury
+    approve: true
+  note: Part of the Sudbury operations.
+- key: thompson
+  set:
+    label: Thompson
+    region: Manitoba
+    approve: true
+  note: Region added.
+- key: vale canada thompson
+  set:
+    action: alias
+    existing: Thompson
+    approve: true
+  note: Same operations.
+- key: thompson mine extension
+  set:
+    action: alias
+    existing: Thompson
+    approve: true
+  note: Part of Thompson.
+- key: kennecott
+  set:
+    region: Utah
+    approve: true
+  note: Kennecott (Bingham Canyon) is in Utah.
+- key: kennecott copper
+  set:
+    action: alias
+    existing: Kennecott
+    approve: true
+  note: Same operation.
+- key: kennecott utah copper
+  set:
+    action: alias
+    existing: Kennecott
+    approve: true
+  note: Same operation.
+- key: bingham canyon us
+  set:
+    action: alias
+    existing: Kennecott
+    approve: true
+  note: Kennecott's mine.
+- key: minera escondida
+  set:
+    action: alias
+    existing: Escondida
+    approve: true
+  note: Same mine.
+- key: minera spence
+  set:
+    action: alias
+    existing: Spence
+    approve: true
+  note: Same mine.
+- key: spence growth option
+  set:
+    action: alias
+    existing: Spence
+    approve: true
+  note: Expansion of Spence.
+- key: pampa norte cerro colorado
+  set:
+    action: alias
+    existing: Cerro Colorado
+    approve: true
+  note: Same mine.
+- key: salobo copper
+  set:
+    action: alias
+    existing: Salobo
+    approve: true
+  note: Same mine.
+- key: western australia nickel
+  set:
+    action: alias
+    existing: Nickel West
+    approve: true
+  note: Same business.
+- key: mt cattlin
+  set:
+    parent: ALTM
+    approve: true
+  note: Allkem's Mt Cattlin operation (now Arcadium), not Atlas Lithium's.
+- key: mt cattlin spodumene
+  set:
+    action: alias
+    existing: Mt Cattlin
+    approve: true
+  note: Same operation.
+- key: olaroz
+  set:
+    label: Olaroz
+    parent: ALTM
+    approve: true
+  note: Allkem's Olaroz (now Arcadium).
+- key: olaroz brine based
+  set:
+    action: alias
+    existing: Olaroz
+    approve: true
+  note: Same operation.
+- key: naraha
+  set:
+    parent: ALTM
+    approve: true
+  note: Allkem's lithium hydroxide plant in Japan (now Arcadium).
+- key: salar del hombre muerto
+  set:
+    parent: ALTM
+    approve: true
+  note: Livent's (now Arcadium's) brine operation.
+- key: fenix
+  set:
+    parent: ALTM
+    approve: true
+  note: Livent's (now Arcadium's) Fénix operation.
+- key: fenix manufacturing
+  set:
+    action: alias
+    existing: Fénix
+    approve: true
+  note: Same site.
+- key: guemes manufacturing
+  set:
+    label: Güemes facility
+    parent: ALTM
+    approve: true
+  note: Livent's (now Arcadium's) Güemes plant.
+- key: guemes
+  set:
+    action: alias
+    existing: Güemes facility
+    approve: true
+  note: Same plant.
+- key: whabouchi
+  set:
+    parent: ALTM
+    approve: true
+  note: Nemaska Lithium's mine.
+- key: nemaska lithium
+  set:
+    action: skip
+    approve: true
+  note: 'Duplicate: Nemaska Lithium is proposed as a company; the mine is Whabouchi.'
+- key: la negra chile
+  set:
+    action: alias
+    existing: La Negra facility
+    approve: true
+  note: Same plant.
+- key: qinzhou
+  set:
+    action: alias
+    existing: Qinzhou lithium processing plant
+    approve: true
+  note: Same plant.
+- key: tianyuan lithium processing
+  set:
+    region: China
+    approve: true
+  note: Region set to China.
+- key: ewoyaa
+  set:
+    parent: Atlantic Lithium
+    region: Ghana
+    approve: true
+  note: Atlantic Lithium's Ghana project.
+- key: ewoyaa lithium
+  set:
+    action: alias
+    existing: Ewoyaa project
+    approve: true
+  note: Same project.
+- key: dle demonstration
+  set:
+    approve: true
+  note: Standard Lithium's demonstration plant in Arkansas.
+- key: arkansas lithium
+  set:
+    action: alias
+    existing: DLE Demonstration Plant
+    approve: true
+  note: Same plant.
+- key: independence
+  set:
+    action: alias
+    existing: Fort Worth Facility
+    approve: true
+  note: MP's Independence facility is its Fort Worth magnet plant.
+- key: fab1 manufacturing
+  set:
+    action: alias
+    existing: Fab1
+    approve: true
+  note: Same plant.
+- key: fab 1
+  set:
+    action: alias
+    existing: Fab1
+    approve: true
+  note: Same plant.
+- key: fab1
+  set:
+    region: California
+    approve: true
+  note: Enovix Fab1, Fremont.
+- key: fab2 manufacturing
+  set:
+    action: alias
+    existing: Fab2
+    approve: true
+  note: Same plant.
+- key: fab 2
+  set:
+    action: alias
+    existing: Fab2
+    approve: true
+  note: Same plant (operated by Enovix).
+- key: fab2
+  set:
+    region: Malaysia
+    approve: true
+  note: Region added.
+- key: tonopah flats lithium
+  set:
+    action: alias
+    existing: Tonopah Flats
+    approve: true
+  note: Same project.
+- key: 2500 peru drive
+  set:
+    approve: true
+  note: ABAT's recycling facility at McCarran, Nevada.
+- key: mccarran nevada
+  set:
+    action: alias
+    existing: 2500 Peru Drive facility
+    approve: true
+  note: Same facility (ABAT's, not Ascend's).
+- key: huzhou
+  set:
+    parent: MVST
+    approve: true
+  note: Microvast's Huzhou facility.
+- key: cqp
+  set:
+    parent: TE
+    approve: true
+  note: FREYR's (now T1 Energy's) customer qualification plant in Mo i Rana.
+- key: customer qualification
+  set:
+    action: alias
+    existing: CQP Mo i Rana
+    approve: true
+  note: Same plant (FREYR, not Tesla).
+- key: nanjing amtec phase i
+  set:
+    action: alias
+    existing: Nanjing AMTEC
+    approve: true
+  note: Phase of the same plant.
+- key: nanjing amtec phase ii
+  set:
+    action: alias
+    existing: Nanjing AMTEC
+    approve: true
+  note: Phase of the same plant.
+- key: vale taiwan
+  set:
+    action: alias
+    existing: Kaohsiung refinery
+    approve: true
+  note: Vale's Taiwan refinery is in Kaohsiung.
+- key: vale nickel dalian
+  set:
+    action: alias
+    existing: Dalian refinery
+    approve: true
+  note: Same refinery.
+- key: vnc
+  set:
+    region: New Caledonia
+    approve: true
+  note: Vale New Caledonia nickel plant.
+- key: clydach refinery
+  set:
+    region: United Kingdom
+    approve: true
+  note: Region added.
+- key: litdc
+  set:
+    action: alias
+    existing: Lithium Technical Development Center
+    approve: true
+  note: Same centre.
+- key: process testing
+  set:
+    action: alias
+    existing: Lithium Technical Development Center
+    approve: true
+  note: Reno testing site of the same centre.
+- key: lithium technical development center
+  set:
+    parent: LAC
+    approve: true
+  note: Lithium Americas' Reno centre.
+- key: marbl
+  set:
+    action: alias
+    existing: MARBL
+    approve: true
+  note: The MARBL joint venture company.
+- key: marbl lithium joint venture
+  set:
+    action: alias
+    existing: MARBL
+    approve: true
+  note: The MARBL joint venture company.
+- key: spoke
+  set:
+    action: skip
+    approve: true
+  note: Generic Li-Cycle facility reference.
+- key: spokes
+  set:
+    action: skip
+    approve: true
+  note: Generic Li-Cycle facility reference.
+- key: new york spoke
+  set:
+    action: new
+    kind: facility
+    label: New York Spoke
+    parent: LICY
+    region: New York
+    battery_relevant: true
+    approve: true
+  note: Li-Cycle's New York spoke is a different site from the Rochester Hub.
+- key: ontario spoke
+  set:
+    region: Ontario
+    approve: true
+  note: Region added.
+- key: planned portovesme hub
+  set:
+    region: Italy
+    approve: true
+  note: Region added.
+- key: silmet
+  set:
+    parent: Neo Performance Materials
+    region: Estonia
+    approve: true
+  note: Neo Performance Materials' rare earth separation plant in Estonia.
+- key: other brazil lithium
+  set:
+    action: skip
+    approve: true
+  note: Generic description.
+- key: first
+  set:
+    action: skip
+    approve: true
+  note: Generic ('First Mine').
+- key: second
+  set:
+    action: skip
+    approve: true
+  note: Generic ('Second Mine').
+- key: port of tocopilla terminal
+  set:
+    label: Tocopilla Port
+    approve: true
+  note: SQM's export port.
+- key: tocopilla port
+  set:
+    action: alias
+    existing: Tocopilla Port
+    approve: true
+  note: Same port.
+- key: port facilities at tocopilla
+  set:
+    action: alias
+    existing: Tocopilla Port
+    approve: true
+  note: Same port.
+- key: lithium chemical
+  set:
+    action: alias
+    existing: SQM Lithium Chemical facility
+    approve: true
+  note: Same plant.
+- key: mdg
+  set:
+    label: Mount Dromedary Graphite
+    approve: true
+  note: NOVONIX's Mount Dromedary graphite project.
+- key: mount dromedary graphite
+  set:
+    action: alias
+    existing: Mount Dromedary Graphite
+    approve: true
+  note: Same project.
+- key: pilgangoora
+  set:
+    parent: Pilbara Minerals
+    approve: true
+  note: Pilbara Minerals' operation.
+- key: chemical
+  set:
+    approve: false
+  note: Unclear whether this is Albemarle's or Piedmont's Kings Mountain plant; check the quotes.
+- key: toliara
+  set:
+    region: Madagascar
+    approve: true
+  note: Energy Fuels' mineral-sands project (monazite for rare earths); region added.
+- key: killick lithium
+  set:
+    parent: ''
+    approve: false
+  note: Parent 'Power Minerals' is not a node; check the quotes for the owner.
+- key: strathmore resources us
+  set:
+    action: skip
+    approve: true
+  note: Uranium (Roca Honda); off-topic for the battery chain.
+- key: ev line
+  set:
+    action: skip
+    approve: true
+  note: Generic name for a production line, not a facility.
+- key: rbm
+  set:
+    action: skip
+    approve: true
+  note: Titanium and zircon; off-topic for the battery chain.
+- key: targovishte bulgaria
+  set:
+    region: Bulgaria
+    approve: true
+  note: EnerSys plant in Bulgaria; region added.
+- key: jadar lithium
+  set:
+    action: alias
+    existing: Jadar Project
+    approve: true
+  note: Same project as Jadar.
+- key: 20gwh expansion
+  set:
+    approve: false
+  note: Location not stated in the quotes.
+- key: npi
+  set:
+    approve: false
+  note: Unclear what NPI refers to; check the quotes.
+- key: onto
+  set:
+    approve: false
+  note: Location and owner unclear; check the quotes.
+- key: lpm 1
+  set:
+    approve: false
+  note: Location to check in the quotes.

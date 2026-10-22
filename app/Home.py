@@ -13,6 +13,8 @@ st.markdown(
 
 - **Graph Explorer**: browse extracted triples and the edges they form, see the evidence behind each edge,
   inspect rejected triples and unresolved names, and mark triples correct or wrong.
+- **Curation**: review proposed aliases, new nodes and skips for the node lists, with the evidence and
+  quotes behind each, before `ripplekg curate apply` changes anything.
 
 Pages for questions, event replay, results and data quality come with later stages.
 """

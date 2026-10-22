@@ -252,7 +252,7 @@ def cmd_curate(args: argparse.Namespace) -> int:
     print(f"{len(groups)} name groups seen >= {args.min_count} times: {len(generic)} generic (rule), "
           f"{len(to_triage)} for LLM triage, {len(suggestions)} with a fuzzy match")  # fmt: skip
     provider = ClaudeProvider(model=args.model, effort="low")
-    saved = settings.DATA_DIR / "curation" / f"{args.round}_decisions.json"
+    saved = settings.CONFIG_DIR / "curation" / f"{args.round}_decisions.json"
     known = {} if args.retriage or not saved.exists() else json.loads(saved.read_text())
     decisions, cost = curation.triage(
         to_triage, suggestions, ont, provider, ResponseCache(settings.DATA_DIR / "curation" / "cache"), known
@@ -260,7 +260,18 @@ def cmd_curate(args: argparse.Namespace) -> int:
     saved.parent.mkdir(parents=True, exist_ok=True)
     saved.write_text(json.dumps(decisions, indent=1, sort_keys=True))
     print(f"reused {len(known)} saved decisions, asked the model about {len(decisions) - len(known)} groups")
-    draft = curation.build_draft(groups, suggestions, decisions, ont)
+    corrections_path = settings.CONFIG_DIR / "curation" / f"{args.round}_corrections.yaml"
+    corrections = yaml.safe_load(corrections_path.read_text()) if corrections_path.exists() else {}
+    if corrections:
+        print(f"applying {len(corrections.get('corrections', []))} reviewer corrections and "
+              f"{len(corrections.get('add_nodes', []))} added nodes")  # fmt: skip
+    draft = curation.build_draft(
+        groups,
+        suggestions,
+        curation.apply_corrections(decisions, corrections),
+        ont,
+        corrections.get("add_nodes"),
+    )
     out = settings.CONFIG_DIR / "curation" / f"{args.round}.yaml"
     out.parent.mkdir(parents=True, exist_ok=True)
     body = yaml.safe_dump(draft, sort_keys=False, allow_unicode=True, width=110)

@@ -400,6 +400,23 @@ def triage(
     return out, cost
 
 
+def apply_corrections(decisions: dict[str, dict], corrections: dict) -> dict[str, dict]:
+    """Reviewer corrections override the model's decision for a group; each keeps its note.
+
+    A correction for a group the model did not decide (for example a rule-based skip) creates
+    the decision. `approve` defaults to true for corrected entries unless the correction says so.
+    """
+    out = {k: dict(v) for k, v in decisions.items()}
+    base = {"action": "skip", "existing": "", "kind": "", "label": "", "parent": "", "region": "",
+            "battery_relevant": True, "reason": "", "confidence": 1.0}  # fmt: skip
+    for c in corrections.get("corrections", []):
+        d = out.setdefault(c["key"], dict(base))
+        d.update(c.get("set", {}))
+        d["review_note"] = c["note"]
+        d["review_approve"] = c.get("set", {}).get("approve", True)
+    return out
+
+
 def _slug(label: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", label.upper())[:12] or "NODE"
 
@@ -409,9 +426,12 @@ def build_draft(
     suggestions: dict[str, tuple[str, float]],
     decisions: dict[str, dict],
     ont: Ontology,
+    added_nodes: list[dict] | None = None,
 ) -> dict:
     """The review file's content: aliases, new nodes and skips, each with its evidence."""
     universe_ids = {n.ref for n in ont.nodes.values() if n.kind == "company"}
+    new_labels = {d["label"] for d in decisions.values() if d.get("action") == "new" and d.get("label")}
+    new_labels |= {x["label"] for x in added_nodes or []}
     aliases, new_nodes, skips, review = [], [], [], []
     used_ids: set[str] = {n.id for n in ont.nodes.values()}
     for g in groups:
@@ -423,18 +443,26 @@ def build_draft(
             "mentioned_by": [f for f, _ in g.filers.most_common(4)],
             "quotes": list(g.quotes),
         }
-        if is_generic(g.label):
+        d = decisions.get(g.key)
+        if is_generic(g.label) and (d is None or "review_note" not in d):
             skips.append({"name": g.label, **evidence, "reason": "generic phrase (rule)", "approve": True})
             continue
-        d = decisions.get(g.key)
         if d is None:
             review.append({"name": g.label, **evidence, "reason": "no LLM decision"})
             continue
         conf = round(float(d["confidence"]), 2)
         base = {**evidence, "confidence": conf, "reason": d["reason"], "approve": conf >= 0.8}
+        if "review_note" in d:
+            base["review_note"] = d["review_note"]
+            base["approve"] = bool(d["review_approve"])
         if g.key in suggestions:
             base["fuzzy_match"] = f"{suggestions[g.key][0]} ({suggestions[g.key][1]:.0f})"
         if d["action"] == "alias":
+            if d["existing"] in new_labels:
+                aliases.append(
+                    {"node": d["existing"], "node_is_new": True, "add_aliases": evidence["variants"], **base}
+                )
+                continue
             if d["existing"] not in ont.nodes:
                 review.append({"name": g.label, **base, "reason": f"alias to unknown node {d['existing']!r}"})
                 continue
@@ -465,6 +493,26 @@ def build_draft(
             new_nodes.append(entry)
         else:
             skips.append({"name": g.label, **base})
+    for extra in added_nodes or []:
+        entry = {
+            "kind": extra["kind"],
+            "id": extra["id"],
+            "label": extra["label"],
+            "aliases": extra.get("aliases", []),
+            "key": f"added:{extra['id']}",
+            "seen": 0,
+            "expected_kind": [extra["kind"]],
+            "variants": [],
+            "mentioned_by": [],
+            "quotes": [],
+            "confidence": 1.0,
+            "reason": "added by reviewer",
+            "review_note": extra["note"],
+            "approve": True,
+        }
+        if extra.get("parent"):
+            entry["parent"] = extra["parent"]
+        new_nodes.append(entry)
     draft = {"aliases": aliases, "new_nodes": new_nodes, "skip": skips, "needs_review": review}
     return validate_draft(merge_duplicate_nodes(draft), ont)
 
@@ -500,6 +548,8 @@ def validate_draft(draft: dict, ont: Ontology) -> dict:
 
     for e in draft["aliases"]:
         issues = []
+        if e.get("node_is_new") and normalize_name(e["node"]) not in new_labels:
+            issues.append(f"alias target {e['node']!r} is not a proposed new node")
         node = ont.nodes.get(e["node"])
         if node is not None and e["expected_kind"] and node.kind not in e["expected_kind"]:
             issues.append(f"kind mismatch: {e['node']} is a {node.kind}, the name appears where a "
@@ -532,7 +582,8 @@ def validate_draft(draft: dict, ont: Ontology) -> dict:
             )
         if e.get("parent") and not known(e["parent"]):
             issues.append(f"parent {e['parent']!r} is not a node")
-        if e["kind"] == "facility" and e.get("region") not in regions:
+        new_regions = {x["label"] for x in draft["new_nodes"] if x["kind"] == "region"}
+        if e["kind"] == "facility" and e.get("region") not in regions | new_regions:
             issues.append(f"region {e.get('region')!r} is not a known region")
         e["issues"] = issues
     for section in ("aliases", "new_nodes"):
