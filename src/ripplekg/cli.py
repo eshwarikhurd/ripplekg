@@ -233,6 +233,8 @@ def cmd_pilot(args: argparse.Namespace) -> int:
 
 
 def cmd_curate(args: argparse.Namespace) -> int:
+    import json
+
     import yaml
 
     from ripplekg.explore.data import available_runs, load_run
@@ -250,9 +252,14 @@ def cmd_curate(args: argparse.Namespace) -> int:
     print(f"{len(groups)} name groups seen >= {args.min_count} times: {len(generic)} generic (rule), "
           f"{len(to_triage)} for LLM triage, {len(suggestions)} with a fuzzy match")  # fmt: skip
     provider = ClaudeProvider(model=args.model, effort="low")
+    saved = settings.DATA_DIR / "curation" / f"{args.round}_decisions.json"
+    known = {} if args.retriage or not saved.exists() else json.loads(saved.read_text())
     decisions, cost = curation.triage(
-        to_triage, suggestions, ont, provider, ResponseCache(settings.DATA_DIR / "curation" / "cache")
+        to_triage, suggestions, ont, provider, ResponseCache(settings.DATA_DIR / "curation" / "cache"), known
     )
+    saved.parent.mkdir(parents=True, exist_ok=True)
+    saved.write_text(json.dumps(decisions, indent=1, sort_keys=True))
+    print(f"reused {len(known)} saved decisions, asked the model about {len(decisions) - len(known)} groups")
     draft = curation.build_draft(groups, suggestions, decisions, ont)
     out = settings.CONFIG_DIR / "curation" / f"{args.round}.yaml"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -404,6 +411,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--run", default="v1-annual")
     p.add_argument("--min-count", type=int, default=3)
     p.add_argument("--model", default="claude-haiku-5-5")
+    p.add_argument("--retriage", action="store_true", help="ignore saved decisions and ask the model again")
     p.set_defaults(func=cmd_curate)
     return parser
 

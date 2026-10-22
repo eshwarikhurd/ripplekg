@@ -247,7 +247,7 @@ def collect_groups(triples: pd.DataFrame, ont: Ontology, min_count: int = MIN_CO
         g = groups.setdefault(key, Group(key))
         g.variants[name] += 1
         if rel is not None:
-            for k in getattr(rel, end):
+            for k in sorted(getattr(rel, end)):  # sorted: set order changes between runs
                 g.kinds[k] += 1
         g.filers[r.filer] += 1
         q = r.quote_full or r.quote
@@ -381,10 +381,13 @@ def triage(
     ont: Ontology,
     provider: LLMProvider,
     cache: ResponseCache,
+    known: dict[str, dict] | None = None,
 ) -> tuple[dict[str, dict], float]:
-    """LLM proposals per group key, and the cost of this run."""
+    """LLM proposals per group key, and the cost of this run. Groups already in `known` (decisions
+    saved by an earlier draft) are not sent again, so a rebuilt draft keeps the same proposals."""
     system = triage_system(ont)
-    out, cost = {}, 0.0
+    out, cost = dict(known or {}), 0.0
+    groups = [g for g in groups if g.key not in out]
     for start in range(0, len(groups), BATCH):
         batch = groups[start : start + BATCH]
         result = cached_complete(
@@ -413,9 +416,12 @@ def build_draft(
     used_ids: set[str] = {n.id for n in ont.nodes.values()}
     for g in groups:
         evidence = {
+            "key": g.key,
             "seen": g.count,
+            "expected_kind": [k for k, _ in g.kinds.most_common()],
             "variants": [v for v, _ in g.variants.most_common(6)],
             "mentioned_by": [f for f, _ in g.filers.most_common(4)],
+            "quotes": list(g.quotes),
         }
         if is_generic(g.label):
             skips.append({"name": g.label, **evidence, "reason": "generic phrase (rule)", "approve": True})
@@ -459,7 +465,83 @@ def build_draft(
             new_nodes.append(entry)
         else:
             skips.append({"name": g.label, **base})
-    return {"aliases": aliases, "new_nodes": new_nodes, "skip": skips, "needs_review": review}
+    draft = {"aliases": aliases, "new_nodes": new_nodes, "skip": skips, "needs_review": review}
+    return validate_draft(merge_duplicate_nodes(draft), ont)
+
+
+def merge_duplicate_nodes(draft: dict) -> dict:
+    """Several groups can propose the same new node ("Lithium Nevada" and "Lithium Nevada Corp." if
+    grouping missed them). Merge them into one entry with all aliases and evidence."""
+    merged: dict[tuple[str, str], dict] = {}
+    for e in draft["new_nodes"]:
+        key = (e["kind"], normalize_name(e["label"]))
+        if key not in merged:
+            merged[key] = e
+            continue
+        m = merged[key]
+        m["aliases"] = list(dict.fromkeys(m["aliases"] + e["aliases"]))
+        m["variants"] = list(dict.fromkeys(m["variants"] + e["variants"]))
+        m["mentioned_by"] = list(dict.fromkeys(m["mentioned_by"] + e["mentioned_by"]))
+        m["quotes"] = (m["quotes"] + e["quotes"])[:3]
+        m["seen"] += e["seen"]
+        m["confidence"] = max(m["confidence"], e["confidence"])
+        m.setdefault("merged_from", []).append(e["key"])
+    return {**draft, "new_nodes": list(merged.values())}
+
+
+def validate_draft(draft: dict, ont: Ontology) -> dict:
+    """Attach rule-based issues to entries; an entry with issues is never pre-approved."""
+    existing = {normalize_name(ref): ref for ref in ont.nodes}
+    new_labels = {normalize_name(e["label"]): e for e in draft["new_nodes"]}
+    regions = {ref for ref, n in ont.nodes.items() if n.kind == "region"}
+
+    def known(label: str) -> bool:
+        return normalize_name(label) in existing or normalize_name(label) in new_labels
+
+    for e in draft["aliases"]:
+        issues = []
+        node = ont.nodes.get(e["node"])
+        if node is not None and e["expected_kind"] and node.kind not in e["expected_kind"]:
+            issues.append(f"kind mismatch: {e['node']} is a {node.kind}, the name appears where a "
+                          f"{'/'.join(e['expected_kind'])} is expected")  # fmt: skip
+        e["issues"] = issues
+    from ripplekg.extraction.verify import Resolver  # local import: verify depends on this package
+
+    resolver = Resolver(ont)
+    for e in draft["new_nodes"]:
+        # The model may write a parent or region by name ("Rio Tinto"); store the node label (RIO).
+        if e.get("parent"):
+            kinds = {"company"} if e["kind"] in ("company", "facility") else {e["kind"]}
+            ref = resolver.resolve(e["parent"], kinds)
+            if ref and ref != e["parent"]:
+                e["parent_written"], e["parent"] = e["parent"], ref
+        if e["kind"] == "facility" and e.get("region"):
+            ref = resolver.resolve(e["region"], {"region"})
+            if ref and ref != e["region"]:
+                e["region_written"], e["region"] = e["region"], ref
+        issues = []
+        if len(e["label"].split()) > 4:
+            issues.append("label longer than 4 words")
+        if normalize_name(e["label"]) in existing:
+            issues.append(
+                f"same label as existing node {existing[normalize_name(e['label'])]}: make it an alias"
+            )
+        if e["expected_kind"] and e["kind"] not in e["expected_kind"]:
+            issues.append(
+                f"kind {e['kind']} differs from where the name appears ({'/'.join(e['expected_kind'])})"
+            )
+        if e.get("parent") and not known(e["parent"]):
+            issues.append(f"parent {e['parent']!r} is not a node")
+        if e["kind"] == "facility" and e.get("region") not in regions:
+            issues.append(f"region {e.get('region')!r} is not a known region")
+        e["issues"] = issues
+    for section in ("aliases", "new_nodes"):
+        for e in draft[section]:
+            if e["issues"]:
+                e["approve"] = False
+    for e in draft["skip"] + draft["needs_review"]:
+        e.setdefault("issues", [])
+    return draft
 
 
 DRAFT_HEADER = """# Curation round {round}: proposed changes to the node lists. Nothing here is applied yet.

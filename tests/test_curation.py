@@ -91,3 +91,41 @@ def test_build_draft_sections_and_scope_rule():
     new = {n["label"]: n for n in d["new_nodes"]}
     assert new["Atlantic Lithium"]["listing"] == "to verify" and new["Atlantic Lithium"]["approve"] is True
     assert new["Iron Ore Co"]["approve"] is False  # off-topic but frequent and linked: kept, low confidence
+
+
+def test_validation_flags_kind_mismatch_unknown_parent_and_duplicates():
+    groups = [group("Lithium Nevada", 10), group("LN Holdco Two", 4), group("Arizona Spoke", 8)]
+    groups[2].kinds = Counter({"facility": 8})
+    decisions = {
+        variant_key("Lithium Nevada"): decision("alias", existing="Thacker Pass"),
+        variant_key("LN Holdco Two"): decision("new", kind="company", label="LN Holdco Two", parent="NOPE"),
+        variant_key("Arizona Spoke"): decision(
+            "new", kind="facility", label="Arizona Spoke", parent="LICY", region=""
+        ),
+    }  # fmt: skip
+    d = build_draft(groups, {}, decisions, ONT)
+    alias = d["aliases"][0]
+    assert "kind mismatch" in alias["issues"][0] and alias["approve"] is False
+    new = {n["label"]: n for n in d["new_nodes"]}
+    assert any("parent 'NOPE'" in i for i in new["LN Holdco Two"]["issues"])
+    assert any("not a known region" in i for i in new["Arizona Spoke"]["issues"])
+    assert all(n["approve"] is False for n in d["new_nodes"])
+
+
+def test_duplicate_new_nodes_are_merged():
+    groups = [group("Atlantic Lithium", 20), group("Atlantic Lithium Plc Group", 5)]
+    decisions = {g.key: decision("new", kind="company", label="Atlantic Lithium") for g in groups}
+    (n,) = build_draft(groups, {}, decisions, ONT)["new_nodes"]
+    assert n["seen"] == 25 and len(n["merged_from"]) == 1
+
+
+def test_parent_and_region_names_resolve_to_node_labels():
+    groups = [group("Kennecott", 30)]
+    groups[0].kinds = Counter({"facility": 30})
+    decisions = {
+        groups[0].key: decision(
+            "new", kind="facility", label="Kennecott", parent="Rio Tinto", region="Nevada"
+        )
+    }
+    (n,) = build_draft(groups, {}, decisions, ONT)["new_nodes"]
+    assert (n["parent"], n["region"], n["issues"]) == ("RIO", "Nevada", [])
