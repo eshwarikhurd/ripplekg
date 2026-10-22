@@ -15,7 +15,7 @@ examples:
     expect:
       - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: active,
          component: battery-cell, strength: 0.41, strength_basis: revenue_share,
-         quote: "accounted for 41% of our revenue in 2023"}
+         quote: "Sales to Borealis Motors, which purchases battery cells from us for its electric pickup trucks, accounted for 41% of our revenue in 2023."}
 
   - relation: CUSTOMER_OF
     text: >-
@@ -25,7 +25,7 @@ examples:
     expect:
       - {source: Halcyon Materials, relation: SUPPLIES, target: Northwind Cells, status: active,
          component: cathode-active-material,
-         quote: "We purchase substantially all of our cathode active material from Halcyon Materials"}
+         quote: "We purchase substantially all of our cathode active material from Halcyon Materials under a supply agreement that runs through 2027."}
 
   - relation: OFFTAKE
     text: >-
@@ -35,7 +35,7 @@ examples:
     expect:
       - {source: Acme Lithium, relation: OFFTAKE, target: Borealis Motors, status: active,
          material: lithium-hydroxide, strength: 0.60, strength_basis: output_share,
-         quote: "binding offtake agreement with Borealis Motors for 60%"}
+         quote: "In March 2022 we entered into a binding offtake agreement with Borealis Motors for 60% of Phase 1 lithium hydroxide production from the Ridgeway project for ten years."}
 
   - relation: OFFTAKE
     text: >-
@@ -52,7 +52,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Delta Refining, relation: TOLL_PROCESSES, target: Acme Lithium, status: active,
-         material: spodumene, quote: "Delta Refining converts our spodumene concentrate"}
+         material: spodumene, quote: "Under a tolling arrangement, Delta Refining converts our spodumene concentrate into battery-grade lithium carbonate, which we then sell to customers."}
 
   - relation: SOLE_SOURCES_FROM
     text: >-
@@ -62,7 +62,7 @@ examples:
     expect:
       - {source: Northwind Cells, relation: SOLE_SOURCES_FROM, target: Ion Separators Ltd., status: active,
          component: separator, strength_basis: sole_source,
-         quote: "We currently rely on a single supplier, Ion Separators Ltd., for the separator film"}
+         quote: "We currently rely on a single supplier, Ion Separators Ltd., for the separator film used in all of our cells, and a disruption at its plant would halt our production."}
 
   - relation: SOLE_SOURCES_FROM
     text: >-
@@ -79,7 +79,7 @@ examples:
     expect:
       - {source: Northwind Cells, relation: LICENSES_TECHNOLOGY_TO, target: Borealis Motors, status: active,
          component: battery-cell,
-         quote: "We license our lithium iron phosphate cell technology to Borealis Motors"}
+         quote: "We license our lithium iron phosphate cell technology to Borealis Motors for use at its Michigan battery plant in exchange for royalties."}
 
   - relation: DISTRIBUTES_FOR
     text: >-
@@ -89,7 +89,7 @@ examples:
     expect:
       - {source: Gridline Storage, relation: DISTRIBUTES_FOR, target: Northwind Cells, status: active,
          component: battery-module,
-         quote: "We integrate battery modules manufactured by Northwind Cells"}
+         quote: "We integrate battery modules manufactured by Northwind Cells into the energy storage systems we sell to utilities."}
 
   # ---------------------------------------------------------------- B. ownership and capital
   - relation: SUBSIDIARY_OF
@@ -97,9 +97,9 @@ examples:
       Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium.
     filer: Acme Lithium
     expect:
-      - {source: Acme Lithium Australia Pty Ltd, relation: SUBSIDIARY_OF, target: Acme Lithium, status: active,
+      - {source: Acme Lithium Australia, relation: SUBSIDIARY_OF, target: Acme Lithium, status: active,
          strength: 1.0, strength_basis: ownership_share,
-         quote: "Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium"}
+         quote: "Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium."}
 
   - relation: INVESTS_IN
     text: >-
@@ -109,7 +109,7 @@ examples:
     expect:
       - {source: Borealis Motors, relation: INVESTS_IN, target: Acme Lithium, status: active,
          strength: 0.099, strength_basis: ownership_share,
-         quote: "Borealis Motors holds approximately 9.9% of our outstanding common shares"}
+         quote: "Borealis Motors holds approximately 9.9% of our outstanding common shares following its strategic investment in 2021."}
 
   - relation: JV_PARTNER_IN
     text: >-
@@ -119,10 +119,10 @@ examples:
     expect:
       - {source: Borealis Motors, relation: JV_PARTNER_IN, target: Lakeview cell plant, status: active,
          strength: 0.5, strength_basis: ownership_share,
-         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview"}
+         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview cell plant."}
       - {source: Northwind Cells, relation: JV_PARTNER_IN, target: Lakeview cell plant, status: active,
          strength: 0.5, strength_basis: ownership_share,
-         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview"}
+         quote: "Ultra Cells LLC, our 50/50 joint venture with Northwind Cells, operates the Lakeview cell plant."}
 
   - relation: FINANCES_SUPPLY
     text: >-
@@ -132,7 +132,7 @@ examples:
     expect:
       - {source: Borealis Motors, relation: FINANCES_SUPPLY, target: Acme Lithium, status: active,
          material: lithium-carbonate,
-         quote: "Borealis Motors made a $200 million prepayment to us"}
+         quote: "Borealis Motors made a $200 million prepayment to us, to be credited against future deliveries of lithium carbonate."}
 
   - relation: ACQUIRES
     text: >-
@@ -140,7 +140,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Acme Lithium, relation: ACQUIRES, target: Halcyon Materials, status: active,
-         quote: "we completed our acquisition of Halcyon Materials"}
+         quote: "On July 1, 2024, we completed our acquisition of Halcyon Materials."}
 
   - relation: ACQUIRES
     text: >-
@@ -149,7 +149,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Acme Lithium, relation: ACQUIRES, target: Halcyon Materials, status: negated,
-         quote: "Our proposed acquisition of Halcyon Materials was terminated"}
+         quote: "Our proposed acquisition of Halcyon Materials was terminated after regulators declined to approve it."}
 
   # ---------------------------------------------------------------- C. footprint and materials
   - relation: OPERATES
@@ -158,9 +158,9 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Acme Lithium, relation: OPERATES, target: Ridgeway lithium mine, status: active,
-         quote: "We own and operate the Ridgeway lithium mine in Nevada"}
+         quote: "We own and operate the Ridgeway lithium mine in Nevada."}
       - {source: Ridgeway lithium mine, relation: LOCATED_IN, target: Nevada, status: active,
-         quote: "the Ridgeway lithium mine in Nevada"}
+         quote: "We own and operate the Ridgeway lithium mine in Nevada."}
 
   - relation: LOCATED_IN
     text: >-
@@ -168,7 +168,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Lakeview cell plant, relation: LOCATED_IN, target: Ohio, status: active,
-         quote: "The Lakeview cell plant, located in Ohio"}
+         quote: "The Lakeview cell plant, located in Ohio, began production in 2022."}
 
   - relation: PRODUCES
     text: >-
@@ -177,7 +177,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Ridgeway project, relation: PRODUCES, target: lithium hydroxide, status: planned,
-         quote: "designed to produce 40,000 tonnes per year of battery-grade lithium hydroxide"}
+         quote: "The Ridgeway project is designed to produce 40,000 tonnes per year of battery-grade lithium hydroxide."}
 
   - relation: CONSUMES
     text: >-
@@ -186,21 +186,23 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: CONSUMES, target: lithium, status: active,
-         quote: "Our cells require lithium, nickel and cobalt"}
+         quote: "Our cells require lithium, nickel and cobalt, and increases in the prices of these materials have materially increased our cost of goods sold."}
       - {source: Northwind Cells, relation: CONSUMES, target: nickel, status: active,
-         quote: "Our cells require lithium, nickel and cobalt"}
+         quote: "Our cells require lithium, nickel and cobalt, and increases in the prices of these materials have materially increased our cost of goods sold."}
       - {source: Northwind Cells, relation: CONSUMES, target: cobalt, status: active,
-         quote: "Our cells require lithium, nickel and cobalt"}
+         quote: "Our cells require lithium, nickel and cobalt, and increases in the prices of these materials have materially increased our cost of goods sold."}
 
   # ---------------------------------------------------------------- D. competition
   - relation: COMPETES_WITH
     text: >-
-      Our principal competitors in battery cells include Northwind Cells and several large
-      Asian manufacturers.
+      Our principal competitors in battery cells include Northwind Cells, Kestrel Energy and
+      several large Asian manufacturers.
     filer: Polaris Battery
     expect:
       - {source: Polaris Battery, relation: COMPETES_WITH, target: Northwind Cells, status: active,
-         quote: "Our principal competitors in battery cells include Northwind Cells"}
+         quote: "Our principal competitors in battery cells include Northwind Cells, Kestrel Energy and several large Asian manufacturers."}
+      - {source: Polaris Battery, relation: COMPETES_WITH, target: Kestrel Energy, status: active,
+         quote: "Our principal competitors in battery cells include Northwind Cells, Kestrel Energy and several large Asian manufacturers."}
 
   # ---------------------------------------------------------------- E. external exposure
   - relation: SOURCES_FROM_REGION
@@ -210,7 +212,34 @@ examples:
     expect:
       - {source: Northwind Cells, relation: SOURCES_FROM_REGION, target: China, status: active,
          strength: 0.70, strength_basis: purchase_share,
-         quote: "Approximately 70% of the graphite used in our anodes is sourced from China"}
+         quote: "Approximately 70% of the graphite used in our anodes is sourced from China."}
+
+  - relation: SELLS_TO_REGION
+    text: >-
+      In 2024, net sales shipped to China represented 36% of our total net sales.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: SELLS_TO_REGION, target: China, status: active,
+         strength: 0.36, strength_basis: revenue_share,
+         quote: "In 2024, net sales shipped to China represented 36% of our total net sales."}
+
+  - relation: OPERATES_IN_REGION
+    text: >-
+      We have mining and processing operations in Chile and Argentina.
+    filer: Acme Lithium
+    expect:
+      - {source: Acme Lithium, relation: OPERATES_IN_REGION, target: Chile, status: active,
+         quote: "We have mining and processing operations in Chile and Argentina."}
+      - {source: Acme Lithium, relation: OPERATES_IN_REGION, target: Argentina, status: active,
+         quote: "We have mining and processing operations in Chile and Argentina."}
+
+  - relation: REGULATED_BY
+    text: >-
+      Our operations are subject to extensive environmental laws and regulations in the
+      jurisdictions where we operate.
+    filer: Acme Lithium
+    expect: []
+    why: Generic laws and regulations, no named authority.
 
   - relation: SUBJECT_TO_TRADE_RESTRICTION
     text: >-
@@ -219,7 +248,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: SUBJECT_TO_TRADE_RESTRICTION, target: China's Ministry of Commerce,
-         status: active, quote: "China's Ministry of Commerce now requires export licences for certain graphite products"}
+         status: active, quote: "China's Ministry of Commerce now requires export licences for certain graphite products, which could delay shipments of anode material to our plants."}
 
   - relation: RECEIVES_INCENTIVE
     text: >-
@@ -228,7 +257,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: RECEIVES_INCENTIVE, target: Section 45X, status: active,
-         quote: "We recognized $85 million of advanced manufacturing production credits under Section 45X"}
+         quote: "We recognized $85 million of advanced manufacturing production credits under Section 45X of the Internal Revenue Code during the year."}
 
   - relation: REGULATED_BY
     text: >-
@@ -237,7 +266,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Ridgeway mine, relation: REGULATED_BY, target: Bureau of Land Management, status: active,
-         quote: "requires a record of decision from the Bureau of Land Management"}
+         quote: "Construction of the Ridgeway mine requires a record of decision from the Bureau of Land Management."}
 
   - relation: EXPOSED_TO_CATASTROPHE
     text: >-
@@ -246,7 +275,7 @@ examples:
     filer: Halcyon Materials
     expect:
       - {source: Bayport cathode plant, relation: EXPOSED_TO_CATASTROPHE, target: Texas, status: active,
-         hazard: hurricane, quote: "Our Bayport cathode plant in Texas is exposed to hurricanes"}
+         hazard: hurricane, quote: "Our Bayport cathode plant in Texas is exposed to hurricanes, and a severe storm could interrupt production for an extended period."}
 
   # ---------------------------------------------------------------- F. disputes
   - relation: IN_DISPUTE_WITH
@@ -256,7 +285,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Halcyon Materials, relation: IN_DISPUTE_WITH, target: Northwind Cells, status: active,
-         quote: "Halcyon Materials filed an arbitration claim against us"}
+         quote: "In 2023 Halcyon Materials filed an arbitration claim against us alleging breach of our cathode supply agreement."}
 
   - relation: PENALIZED_BY
     text: >-
@@ -264,8 +293,8 @@ examples:
       12,000 vehicles equipped with our battery packs.
     filer: Northwind Cells
     expect:
-      - {source: Northwind Cells, relation: PENALIZED_BY, target: National Highway Traffic Safety Administration,
-         status: active, quote: "the National Highway Traffic Safety Administration ordered a recall"}
+      - {source: Northwind Cells, relation: PENALIZED_BY, target: NHTSA,
+         status: active, quote: "In June 2024 the National Highway Traffic Safety Administration ordered a recall of 12,000 vehicles equipped with our battery packs."}
 
   # ---------------------------------------------------------------- status edge cases
   - relation: SUPPLIES
@@ -275,4 +304,4 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: ceased,
-         component: battery-cell, quote: "we no longer sell cells to Borealis"}
+         component: battery-cell, quote: "Our supply agreement with Borealis Motors was terminated in the fourth quarter, and we no longer sell cells to Borealis."}

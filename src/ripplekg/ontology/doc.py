@@ -105,8 +105,8 @@ def render(ont: Ontology, examples: list[Example]) -> str:
             "",
             f"### {title}",
             "",
-            "| Relation | Source → target | Channel | Prior | Meaning |",
-            "|---|---|---|---|---|",
+            "| Relation | Source → target | Channel | Prior | Meaning | When to use it |",
+            "|---|---|---|---|---|---|",
         ]
         for rel in ont.relations.values():
             if rel.family != family:
@@ -117,14 +117,32 @@ def render(ont: Ontology, examples: list[Example]) -> str:
                 channel += f" (upstream = {rel.upstream})"
             out.append(
                 f"| `{rel.name}`{sym} | {_kinds(rel.source)} → {_kinds(rel.target)} | "
-                f"{channel} | {rel.prior} | {rel.description} |"
+                f"{channel} | {rel.prior} | {rel.description} | {rel.guidance} |"
             )
 
     out += [
         "",
+        "## Deduplication",
+        "",
+        "- Within a chunk, an exact repeat of (source, relation, target) is kept once. Symmetric relations",
+        "  are stored with their endpoints in sorted order, so A↔B and B↔A are the same edge.",
+        "- Exclusive groups list near-synonymous relations, most specific first. For the same pair of nodes",
+        "  supported by the same quote, only the first relation of a group that appears is kept:",
+        "",
+    ]
+    out += [f"  - **{g}**: {' > '.join(m)}" for g, m in ont.exclusive_groups.items()]
+    out += [
+        "",
+        "- Across chunks and filings, repeated sightings of a fact are its evidence, not duplicates: the",
+        "  graph builder merges them into one edge with a date range.",
+        "- Companies are stored by ticker, other nodes by curated id, so name variants cannot create",
+        "  duplicate nodes. Endpoints longer than 4 words are rejected.",
+    ]
+    out += [
+        "",
         "## Examples",
         "",
-        "Fictional companies. Each quote is checked to appear verbatim in its sentence.",
+        "Fictional companies. Each quote is checked to be a complete sentence copied verbatim from the text.",
         "",
     ]
     for ex in examples:

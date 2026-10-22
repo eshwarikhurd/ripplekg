@@ -15,6 +15,7 @@
 #                strong 1.0 | normal 0.6 | weak 0.3 (set before any data; not tuned)
 #   symmetric  stored as two directed edges
 #   strength_bases   which disclosed percentages may set the edge's strength
+#   guidance   when to use the relation and when a neighbouring one fits better (shown to the extractor)
 
 relations:
   # ---------------------------------------------------------------- A. trade links
@@ -28,6 +29,7 @@ relations:
     strength_bases: [revenue_share, purchase_share]
     attributes: [material, component]
     description: Source sells goods or materials to target.
+    guidance: Use when the source sells or delivers goods, materials or components to the target. Not for long-term mine or refinery offtake (OFFTAKE) or an only/single-supplier statement (SOLE_SOURCES_FROM).
   OFFTAKE:
     family: trade
     source: [company]
@@ -38,6 +40,7 @@ relations:
     strength_bases: [output_share, revenue_share]
     attributes: [material]
     description: Long-term agreement for target to buy source's mine or refinery output.
+    guidance: Use for a binding offtake or long-term purchase agreement for a mine's or refinery's output. Not for ordinary product sales (SUPPLIES).
   TOLL_PROCESSES:
     family: trade
     source: [company]
@@ -48,6 +51,7 @@ relations:
     strength_bases: [output_share]
     attributes: [material]
     description: Source converts material that target owns (tolling or contract refining).
+    guidance: Use when the source processes or refines material that the target owns, for a fee. Not when the source buys the material (SUPPLIES).
   SOLE_SOURCES_FROM:
     family: trade
     source: [company]
@@ -58,6 +62,7 @@ relations:
     strength_bases: [purchase_share, sole_source]
     attributes: [material, component]
     description: Source states that target is its sole, single or limited supplier.
+    guidance: Use when the source says the target is its only, single or one of few suppliers of something. Not for ordinary purchases (SUPPLIES with the ends swapped).
   LICENSES_TECHNOLOGY_TO:
     family: trade
     source: [company]
@@ -68,6 +73,7 @@ relations:
     strength_bases: []
     attributes: [component]
     description: Source licenses battery chemistry, cell design or process technology to target.
+    guidance: Use when the source licenses technology, chemistry or patents to the target. Not for selling products (SUPPLIES).
   DISTRIBUTES_FOR:
     family: trade
     source: [company]
@@ -78,6 +84,7 @@ relations:
     strength_bases: [revenue_share]
     attributes: [component]
     description: Source resells or integrates target's products (for example an energy-storage integrator).
+    guidance: Use when the source resells or integrates the target's products. Not when the source buys inputs for its own products (SUPPLIES with the ends swapped).
 
   # ---------------------------------------------------------------- B. ownership and capital
   SUBSIDIARY_OF:
@@ -88,6 +95,7 @@ relations:
     prior: strong
     strength_bases: [ownership_share]
     description: Source is a consolidated subsidiary of target.
+    guidance: Use when the source is majority-owned or controlled by the target. Not for a minority stake (INVESTS_IN).
   INVESTS_IN:
     family: ownership_capital
     source: [company]
@@ -96,6 +104,7 @@ relations:
     prior: weak
     strength_bases: [ownership_share]
     description: Source holds a minority equity stake in target.
+    guidance: Use for a minority equity stake in a company. Not for majority ownership (SUBSIDIARY_OF), a completed takeover (ACQUIRES), or a prepayment for supply (FINANCES_SUPPLY).
   JV_PARTNER_IN:
     family: ownership_capital
     source: [company]
@@ -104,6 +113,7 @@ relations:
     prior: normal
     strength_bases: [ownership_share]
     description: Source is a joint-venture partner in facility target.
+    guidance: Use when the source co-owns a named joint-venture facility or project. Not when the source alone owns or runs it (OPERATES).
   FINANCES_SUPPLY:
     family: ownership_capital
     source: [company]
@@ -114,6 +124,7 @@ relations:
     strength_bases: [amount_ratio]
     attributes: [material, component]
     description: Source prepays, lends to or invests in target to secure future supply.
+    guidance: Use for a prepayment, loan or investment made explicitly to secure future supply. Not for a purely financial stake (INVESTS_IN).
   ACQUIRES:
     family: ownership_capital
     source: [company]
@@ -122,6 +133,7 @@ relations:
     prior: normal
     strength_bases: []
     description: Source acquires target. Closes target's edges from the closing date and moves them to source.
+    guidance: Use for a completed or agreed takeover of a company. Not for a minority investment (INVESTS_IN).
 
   # ---------------------------------------------------------------- C. footprint and materials
   OPERATES:
@@ -132,6 +144,7 @@ relations:
     prior: strong
     strength_bases: [output_share]
     description: Source owns or operates facility target.
+    guidance: Use when the source owns or runs a specific, named facility, mine, plant or project. Not for a country or region (OPERATES_IN_REGION) or a co-owned joint venture (JV_PARTNER_IN).
   LOCATED_IN:
     family: footprint
     source: [facility]
@@ -140,6 +153,7 @@ relations:
     prior: strong
     strength_bases: []
     description: Facility source is located in region target.
+    guidance: Use when a named facility is in a region. Not for a company's general presence in a region (OPERATES_IN_REGION).
   PRODUCES:
     family: footprint
     source: [company, facility]
@@ -148,6 +162,7 @@ relations:
     prior: normal
     strength_bases: [output_share, revenue_share]
     description: Source produces material or component target.
+    guidance: Use when the source makes or extracts the material or component as output. Not for transporting, storing or reselling it.
   CONSUMES:
     family: footprint
     source: [company]
@@ -156,6 +171,7 @@ relations:
     prior: normal
     strength_bases: [cost_share, purchase_share]
     description: Source depends on material or component target as an input.
+    guidance: Use when the source uses the material or component as an input to production. Not for something it produces (PRODUCES).
 
   # ---------------------------------------------------------------- D. competition
   COMPETES_WITH:
@@ -167,6 +183,7 @@ relations:
     symmetric: true
     strength_bases: []
     description: Source names target as a competitor.
+    guidance: Use when the text names the target as a competitor. Make one edge per named competitor.
 
   # ---------------------------------------------------------------- E. external exposure
   SOURCES_FROM_REGION:
@@ -175,8 +192,27 @@ relations:
     target: [region]
     channel: hub
     prior: normal
-    strength_bases: [purchase_share, revenue_share, cost_share]
-    description: Source buys from or operates in region target to a stated or material degree.
+    strength_bases: [purchase_share, cost_share]
+    description: Source buys inputs or raw materials from region target.
+    guidance: Use when the source buys inputs or raw materials from the region. Not for sales into the region (SELLS_TO_REGION) or operations there (OPERATES_IN_REGION).
+  SELLS_TO_REGION:
+    family: exposure
+    source: [company]
+    target: [region]
+    channel: hub
+    prior: normal
+    strength_bases: [revenue_share]
+    description: Source earns revenue from customers in region target.
+    guidance: Use for sales, revenue or customers in the region. Not for buying inputs there (SOURCES_FROM_REGION).
+  OPERATES_IN_REGION:
+    family: exposure
+    source: [company]
+    target: [region]
+    channel: hub
+    prior: weak
+    strength_bases: []
+    description: Source has operations, facilities or staff in region target, without a named facility.
+    guidance: Use when the text says the source operates in the region but names no specific facility. If a facility is named, use OPERATES and LOCATED_IN instead.
   SUBJECT_TO_TRADE_RESTRICTION:
     family: exposure
     source: [company, material, component]
@@ -185,6 +221,7 @@ relations:
     prior: normal
     strength_bases: [revenue_share, purchase_share]
     description: Source is affected by an export control, tariff or foreign-entity rule imposed by target.
+    guidance: Use when export controls, tariffs, sanctions or foreign-entity rules imposed by the target affect the source.
   RECEIVES_INCENTIVE:
     family: exposure
     source: [company]
@@ -193,6 +230,7 @@ relations:
     prior: normal
     strength_bases: [amount_ratio]
     description: Source receives or relies on a tax credit, grant or loan under program target.
+    guidance: Use when the source receives or expects a tax credit, grant or loan under a named program.
   REGULATED_BY:
     family: exposure
     source: [company, facility]
@@ -201,6 +239,7 @@ relations:
     prior: weak
     strength_bases: []
     description: Source needs permits, licences or approvals from authority target.
+    guidance: Use when the source needs permits, licences or approvals from a named authority. Not for general mentions of laws or regulation.
   EXPOSED_TO_CATASTROPHE:
     family: exposure
     source: [company, facility]
@@ -210,6 +249,7 @@ relations:
     strength_bases: []
     attributes: [hazard]
     description: Source states exposure to a natural hazard (earthquake, flood, drought, water rights) in region target.
+    guidance: Use when the text names a natural hazard (flood, earthquake, drought, hurricane, water rights) affecting the source in the region.
 
   # ---------------------------------------------------------------- F. disputes
   IN_DISPUTE_WITH:
@@ -221,6 +261,7 @@ relations:
     symmetric: true
     strength_bases: []
     description: Litigation or arbitration between the two companies, often over a supply contract.
+    guidance: Use for litigation or arbitration between the two named companies.
   PENALIZED_BY:
     family: disputes
     source: [company]
@@ -229,6 +270,17 @@ relations:
     prior: normal
     strength_bases: []
     description: Source receives a fine, recall order or sanction from authority target.
+    guidance: Use when an authority fined, sanctioned or ordered a recall from the source.
+
+# Near-synonymous relations. For the same pair of nodes in the same chunk, only the first relation
+# of a group that appears is kept (most specific first); the others are recorded as superseded.
+exclusive_groups:
+  ownership: [SUBSIDIARY_OF, ACQUIRES, INVESTS_IN]
+  financing: [FINANCES_SUPPLY, INVESTS_IN]
+  trade: [SOLE_SOURCES_FROM, OFFTAKE, TOLL_PROCESSES, SUPPLIES]
+  facility_role: [JV_PARTNER_IN, OPERATES]
+  region_link: [SUBJECT_TO_TRADE_RESTRICTION, EXPOSED_TO_CATASTROPHE, SOURCES_FROM_REGION, SELLS_TO_REGION, OPERATES_IN_REGION]
+  material_role: [PRODUCES, CONSUMES]
 
 # Labels the extractor may emit that are rewritten into a canonical relation.
 aliases:

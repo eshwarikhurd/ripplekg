@@ -81,7 +81,7 @@ def test_extract_uses_cache_on_second_call(tmp_path):
     assert messages.calls == 1
     assert first.result.cost_usd > 0 and second.result.cost_usd == 0
 
-    v = verify_edge(edge, chunk["text"], ONT, RESOLVER)
+    v = verify_edge(edge, chunk["text"], ONT, RESOLVER, filer="TSLA")
     assert v.ok and v.relation == "SUPPLIES"
     assert (v.source_ref, v.target_ref) == ("PANASONIC", "TSLA")  # CUSTOMER_OF reversed
 
@@ -100,6 +100,7 @@ def test_strength_must_be_backed_by_quote():
     assert not strength_backed(0.4, "accounted for 23% of revenue")
     assert strength_backed(1.0, "a wholly owned subsidiary")
     assert strength_backed(None, "anything")
+    assert strength_backed(float("nan"), "anything")
 
 
 def test_resolver_handles_legal_suffixes_and_kinds():

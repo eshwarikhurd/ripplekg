@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from ripplekg.extraction.dedupe import dedupe_edges
 from ripplekg.extraction.llm import LLMProvider, ResponseCache
 from ripplekg.extraction.prompts import PROMPT_VERSION, ExtractionOutcome, build_prompt, extract
 from ripplekg.extraction.verify import Resolver, verify_edge
@@ -78,7 +79,7 @@ def run_extraction(
                 }
             )
             for e in out.edges:
-                v = verify_edge(e, row["text"], ont, resolver)
+                v = verify_edge(e, row["text"], ont, resolver, filer=row["company_id"])
                 edge_rows.append(
                     {
                         **e,
@@ -90,6 +91,9 @@ def run_extraction(
                         "ok": v.ok,
                         "reason": v.reason,
                         "canonical_relation": v.relation,
+                        "quote_full": v.quote_full,
+                        "material_ref": v.material_ref,
+                        "component_ref": v.component_ref,
                         "source_ref": v.source_ref,
                         "target_ref": v.target_ref,
                         "model": provider.model,
@@ -98,7 +102,8 @@ def run_extraction(
                 )
             if n % 25 == 0:
                 progress(f"{n}/{len(jobs)} calls")
-    return RunResult(pd.DataFrame(outcome_rows), pd.DataFrame(edge_rows))
+    edges = dedupe_edges(pd.DataFrame(edge_rows), ont)
+    return RunResult(pd.DataFrame(outcome_rows), edges)
 
 
 def unresolved_lines(edges: pd.DataFrame, limit: int = 40) -> list[str]:
