@@ -2,8 +2,8 @@
 # protocol's "Deviations" section, never silently.
 #
 # Fields
-#   origin      where the shock starts. A bare id is a company in universe.yaml;
-#               other nodes use kind:id (material:, region:, authority:, program:).
+#   origin      where the shock starts: node labels from the ontology, i.e. a company ticker or ID
+#               from universe.yaml, or the short name of a curated node ("Lithium", "Chile").
 #   shock_type  supply_shock (propagates downstream) | demand_shock (upstream) | mixed (both)
 #   sign        expected direction for the origin: negative | positive | mixed
 #   announced   date the information first became public (local date of the first credible report)
@@ -151,7 +151,7 @@ events:
   - id: catl-jianxiawo-halt-2025
     title: CATL suspends its Jianxiawo lepidolite mine after its licence lapses
     bucket: primary
-    origin: [CATL, "material:lithium"]
+    origin: [CATL, "Lithium"]
     shock_type: supply_shock
     sign: mixed
     announced: 2025-08-10
@@ -213,7 +213,7 @@ events:
   - id: zimbabwe-lithium-ore-ban-2022
     title: Zimbabwe bans exports of unprocessed lithium ore
     bucket: primary
-    origin: ["region:ZW", "material:spodumene"]
+    origin: ["Zimbabwe", "Spodumene"]
     shock_type: supply_shock
     sign: negative
     announced: 2022-12-20
@@ -228,7 +228,7 @@ events:
   - id: chile-national-lithium-strategy-2023
     title: Chile announces a national lithium strategy with state majority control
     bucket: primary
-    origin: ["region:CL", "material:lithium"]
+    origin: ["Chile", "Lithium"]
     shock_type: supply_shock
     sign: negative
     announced: 2023-04-20
@@ -244,7 +244,7 @@ events:
   - id: china-graphite-controls-2023
     title: China imposes export licences on high-grade graphite
     bucket: primary
-    origin: ["material:graphite", "authority:CN-MOFCOM"]
+    origin: ["Graphite", "China Ministry of Commerce"]
     shock_type: supply_shock
     sign: negative
     announced: 2023-10-20
@@ -259,7 +259,7 @@ events:
   - id: drc-cobalt-export-suspension-2025
     title: DR Congo suspends cobalt exports for four months
     bucket: primary
-    origin: ["region:CD", "material:cobalt"]
+    origin: ["DR Congo", "Cobalt"]
     shock_type: supply_shock
     sign: mixed
     announced: 2025-02-22
@@ -274,7 +274,7 @@ events:
   - id: us-china-ev-tariffs-2024
     title: US to raise Section 301 tariffs on Chinese EVs, batteries and critical minerals
     bucket: primary
-    origin: ["authority:US-USTR", "region:CN"]
+    origin: ["USTR", "China"]
     shock_type: mixed
     sign: mixed
     announced: 2024-05-10
@@ -290,7 +290,7 @@ events:
   - id: ira-manchin-deal-2022
     title: Manchin–Schumer deal revives the Inflation Reduction Act and its EV credits
     bucket: primary
-    origin: ["program:US-IRA"]
+    origin: ["Inflation Reduction Act"]
     shock_type: mixed
     sign: positive
     announced: 2022-07-27
@@ -305,7 +305,7 @@ events:
   - id: feoc-guidance-2023
     title: Treasury and DOE propose foreign-entity-of-concern rules for the EV tax credit
     bucket: primary
-    origin: ["program:US-IRA-30D", "region:CN"]
+    origin: ["IRA 30D credit", "China"]
     shock_type: mixed
     sign: mixed
     announced: 2023-12-01
@@ -320,7 +320,7 @@ events:
   - id: suez-ever-given-2021
     title: Ever Given blocks the Suez Canal
     bucket: macro
-    origin: ["region:suez-canal"]
+    origin: ["Suez Canal"]
     shock_type: supply_shock
     sign: negative
     announced: 2021-03-23
@@ -334,7 +334,7 @@ events:
   - id: shanghai-lockdown-2022
     title: Shanghai announces a two-phase citywide lockdown
     bucket: macro
-    origin: ["region:CN-shanghai"]
+    origin: ["Shanghai"]
     shock_type: supply_shock
     sign: negative
     announced: 2022-03-27
@@ -348,7 +348,7 @@ events:
   - id: china-rare-earth-controls-2025
     title: China adds seven medium and heavy rare earths to its export-control list
     bucket: macro
-    origin: ["material:rare-earths", "authority:CN-MOFCOM"]
+    origin: ["Rare earth elements", "China Ministry of Commerce"]
     shock_type: supply_shock
     sign: mixed
     announced: 2025-04-04

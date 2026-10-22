@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import yaml
@@ -51,18 +51,26 @@ class Relation:
         return PRIORS[self.prior]
 
 
+MAX_NODE_WORDS = 4
+
+
 @dataclass(frozen=True)
 class Node:
+    """A graph node. Its `ref` is the label used everywhere outside config: a company's ticker
+    or readable ID, otherwise its short canonical name ("Copper", "Thacker Pass", "China").
+    `id` is the short key config files use to refer to it; `kind` is a property, not part of
+    the label."""
+
     kind: str
     id: str
     name: str
     aliases: tuple[str, ...] = ()
-    parent: str | None = None
+    parent: str | None = None  # ref of the parent node, after loading
     extra: dict = field(default_factory=dict, compare=False, hash=False)
 
     @property
     def ref(self) -> str:
-        return self.id if self.kind == "company" else f"{self.kind}:{self.id}"
+        return self.id if self.kind == "company" else self.name
 
 
 class OntologyError(ValueError):
@@ -86,6 +94,7 @@ class Ontology:
     exclusive_groups: dict[str, tuple[str, ...]]  # near-synonyms, most specific first
     nodes: dict[str, Node]  # ref -> node
     _names: dict[tuple[str, str], str] = field(default_factory=dict, repr=False)  # (kind, normalized) -> ref
+    _by_key: dict[tuple[str, str], str] = field(default_factory=dict, repr=False)  # (kind, config id) -> ref
 
     def node(self, ref: str) -> Node:
         try:
@@ -132,10 +141,16 @@ class Ontology:
         """Parent chain of a node, nearest first."""
         out, node = [], self.node(ref)
         while node.parent:
-            parent_ref = f"{node.kind}:{node.parent}"
-            out.append(parent_ref)
-            node = self.node(parent_ref)
+            out.append(node.parent)
+            node = self.node(node.parent)
         return out
+
+    def ref_for(self, kind: str, config_id: str) -> str:
+        """The node label of a config id, e.g. ("region", "US-NV") -> "Nevada"."""
+        try:
+            return self._by_key[(kind, config_id)]
+        except KeyError:
+            raise KeyError(f"unknown {kind} id {config_id!r}") from None
 
     def lookup(self, kind: str, text: str) -> str | None:
         """Exact (normalized) name or alias match within one node kind."""
@@ -212,8 +227,11 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
         relation_aliases[label] = (raw["relation"], bool(raw.get("reverse", False)))
 
     nodes: dict[str, Node] = {}
+    by_key: dict[tuple[str, str], str] = {}  # (kind, config id) -> ref
     for c in universe.companies:
-        nodes[c.id] = Node("company", c.id, c.name, tuple(c.search_names))
+        n = Node("company", c.id, c.name, tuple(c.search_names))
+        nodes[n.ref] = n
+        by_key[("company", c.id)] = n.ref
     for kind, raw in nodes_raw.items():
         for row in raw.get("nodes", []):
             try:
@@ -230,13 +248,33 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
                 errors.append(f"{kind} node {row}: id, name, aliases and parent must be strings")
                 continue
             if n.ref in nodes:
-                errors.append(f"duplicate node {n.ref}")
+                errors.append(f"node label {n.ref!r} is used by both a {nodes[n.ref].kind} and a {kind}")
+                continue
+            if (kind, n.id) in by_key:
+                errors.append(f"duplicate {kind} id {n.id!r}")
+            if len(n.name.split()) > MAX_NODE_WORDS:
+                errors.append(f"{kind} {n.id}: name {n.name!r} is longer than {MAX_NODE_WORDS} words")
             nodes[n.ref] = n
+            by_key[(kind, n.id)] = n.ref
+
+    # Config files refer to parents by id; from here on the parent is a ref.
+    for ref, n in list(nodes.items()):
+        if n.parent:
+            parent_ref = by_key.get((n.kind, n.parent))
+            if parent_ref is None:
+                errors.append(f"{ref}: parent {n.parent!r} is not a {n.kind}")
+            else:
+                nodes[ref] = replace(n, parent=parent_ref)
+
+    labels: dict[str, str] = {}
+    for ref in nodes:
+        key = normalize_name(ref)
+        if key in labels:
+            errors.append(f"node labels {labels[key]!r} and {ref!r} differ only in case or punctuation")
+        labels[key] = ref
 
     names: dict[tuple[str, str], str] = {}
     for ref, n in nodes.items():
-        if n.parent and f"{n.kind}:{n.parent}" not in nodes:
-            errors.append(f"{ref}: parent {n.parent!r} is not a {n.kind}")
         for text in (n.id, n.name, *n.aliases):
             key = (n.kind, normalize_name(text))
             if key in names and names[key] != ref:
@@ -249,11 +287,11 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
             errors += [
                 f"{ref}: operator {o!r} is not a universe company" for o in ops if o not in universe.by_id
             ]
-            if f"region:{n.extra.get('region')}" not in nodes:
+            if ("region", n.extra.get("region")) not in by_key:
                 errors.append(f"{ref}: unknown region {n.extra.get('region')!r}")
-        if n.kind == "authority" and f"region:{n.extra.get('region')}" not in nodes:
+        if n.kind == "authority" and ("region", n.extra.get("region")) not in by_key:
             errors.append(f"{ref}: unknown region {n.extra.get('region')!r}")
-        if n.kind == "program" and f"authority:{n.extra.get('authority')}" not in nodes:
+        if n.kind == "program" and ("authority", n.extra.get("authority")) not in by_key:
             errors.append(f"{ref}: unknown authority {n.extra.get('authority')!r}")
 
     if errors:
@@ -266,6 +304,7 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
         strength_bases=strength_bases,
         nodes=nodes,
         _names=names,
+        _by_key=by_key,
     )
 
 
@@ -338,7 +377,7 @@ def example_errors(ont: Ontology, examples: list[Example]) -> list[str]:
             if strength is not None and not 0 < strength <= 1:
                 errors.append(f"{tag}: strength {strength} outside (0, 1]")
             for attr in ("material", "component"):
-                if attr in edge and f"{attr}:{edge[attr]}" not in ont.nodes:
+                if attr in edge and (edge[attr] not in ont.nodes or ont.kind_of(edge[attr]) != attr):
                     errors.append(f"{tag}: unknown {attr} {edge[attr]!r}")
             for attr in ("material", "component", "hazard"):
                 if attr in edge and attr not in rel.attributes:

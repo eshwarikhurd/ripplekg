@@ -14,7 +14,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: active,
-         component: battery-cell, strength: 0.41, strength_basis: revenue_share,
+         component: Battery cells, strength: 0.41, strength_basis: revenue_share,
          quote: "Sales to Borealis Motors, which purchases battery cells from us for its electric pickup trucks, accounted for 41% of our revenue in 2023."}
 
   - relation: CUSTOMER_OF
@@ -24,7 +24,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Halcyon Materials, relation: SUPPLIES, target: Northwind Cells, status: active,
-         component: cathode-active-material,
+         component: Cathode active material,
          quote: "We purchase substantially all of our cathode active material from Halcyon Materials under a supply agreement that runs through 2027."}
 
   - relation: OFFTAKE
@@ -34,7 +34,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Acme Lithium, relation: OFFTAKE, target: Borealis Motors, status: active,
-         material: lithium-hydroxide, strength: 0.60, strength_basis: output_share,
+         material: Lithium hydroxide, strength: 0.60, strength_basis: output_share,
          quote: "In March 2022 we entered into a binding offtake agreement with Borealis Motors for 60% of Phase 1 lithium hydroxide production from the Ridgeway project for ten years."}
 
   - relation: OFFTAKE
@@ -52,7 +52,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Delta Refining, relation: TOLL_PROCESSES, target: Acme Lithium, status: active,
-         material: spodumene, quote: "Under a tolling arrangement, Delta Refining converts our spodumene concentrate into battery-grade lithium carbonate, which we then sell to customers."}
+         material: Spodumene, quote: "Under a tolling arrangement, Delta Refining converts our spodumene concentrate into battery-grade lithium carbonate, which we then sell to customers."}
 
   - relation: SOLE_SOURCES_FROM
     text: >-
@@ -61,7 +61,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: SOLE_SOURCES_FROM, target: Ion Separators Ltd., status: active,
-         component: separator, strength_basis: sole_source,
+         component: Separator, strength_basis: sole_source,
          quote: "We currently rely on a single supplier, Ion Separators Ltd., for the separator film used in all of our cells, and a disruption at its plant would halt our production."}
 
   - relation: SOLE_SOURCES_FROM
@@ -78,7 +78,7 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: LICENSES_TECHNOLOGY_TO, target: Borealis Motors, status: active,
-         component: battery-cell,
+         component: Battery cells,
          quote: "We license our lithium iron phosphate cell technology to Borealis Motors for use at its Michigan battery plant in exchange for royalties."}
 
   - relation: DISTRIBUTES_FOR
@@ -88,7 +88,7 @@ examples:
     filer: Gridline Storage
     expect:
       - {source: Gridline Storage, relation: DISTRIBUTES_FOR, target: Northwind Cells, status: active,
-         component: battery-module,
+         component: Battery modules,
          quote: "We integrate battery modules manufactured by Northwind Cells into the energy storage systems we sell to utilities."}
 
   # ---------------------------------------------------------------- B. ownership and capital
@@ -131,7 +131,7 @@ examples:
     filer: Acme Lithium
     expect:
       - {source: Borealis Motors, relation: FINANCES_SUPPLY, target: Acme Lithium, status: active,
-         material: lithium-carbonate,
+         material: Lithium carbonate,
          quote: "Borealis Motors made a $200 million prepayment to us, to be credited against future deliveries of lithium carbonate."}
 
   - relation: ACQUIRES
@@ -304,4 +304,4 @@ examples:
     filer: Northwind Cells
     expect:
       - {source: Northwind Cells, relation: SUPPLIES, target: Borealis Motors, status: ceased,
-         component: battery-cell, quote: "Our supply agreement with Borealis Motors was terminated in the fourth quarter, and we no longer sell cells to Borealis."}
+         component: Battery cells, quote: "Our supply agreement with Borealis Motors was terminated in the fourth quarter, and we no longer sell cells to Borealis."}

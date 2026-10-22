@@ -13,24 +13,22 @@ def row(rel, src, tgt, chunk="c1", quote=Q):
 
 
 def test_exact_duplicates_in_a_chunk_are_kept_once():
-    df = pd.DataFrame([row("PRODUCES", "ALB", "material:lithium")] * 3)
+    df = pd.DataFrame([row("PRODUCES", "ALB", "Lithium")] * 3)
     out = dedupe_edges(df, ONT)
     assert out["ok"].tolist() == [True, False, False]
     assert out["reason"].tolist()[1] == "duplicate in chunk"
 
 
 def test_same_fact_in_another_chunk_is_evidence_not_a_duplicate():
-    df = pd.DataFrame(
-        [row("PRODUCES", "ALB", "material:lithium"), row("PRODUCES", "ALB", "material:lithium", "c2")]
-    )
+    df = pd.DataFrame([row("PRODUCES", "ALB", "Lithium"), row("PRODUCES", "ALB", "Lithium", "c2")])
     assert dedupe_edges(df, ONT)["ok"].all()
 
 
 def test_most_specific_relation_wins_for_same_pair_and_quote():
     df = pd.DataFrame(
         [
-            row("OPERATES", "ALB", "facility:greenbushes"),
-            row("JV_PARTNER_IN", "ALB", "facility:greenbushes"),
+            row("OPERATES", "ALB", "Greenbushes"),
+            row("JV_PARTNER_IN", "ALB", "Greenbushes"),
             row("INVESTS_IN", "PLL", "ELVR"),
             row("SUBSIDIARY_OF", "PLL", "ELVR"),
         ]
@@ -54,6 +52,6 @@ def test_unrelated_relations_on_a_pair_both_stay():
 
 
 def test_rejected_row_does_not_hide_a_valid_one():
-    bad = {**row("PRODUCES", "ALB", "material:lithium"), "ok": False, "reason": "endpoint not in quote"}
-    out = dedupe_edges(pd.DataFrame([bad, row("PRODUCES", "ALB", "material:lithium")]), ONT)
+    bad = {**row("PRODUCES", "ALB", "Lithium"), "ok": False, "reason": "endpoint not in quote"}
+    out = dedupe_edges(pd.DataFrame([bad, row("PRODUCES", "ALB", "Lithium")]), ONT)
     assert out["ok"].tolist() == [False, True]

@@ -24,22 +24,22 @@ def test_every_event_origin_resolves_to_a_node():
 
 def test_edge_signatures():
     assert ONT.edge_error("SUPPLIES", "PANASONIC", "TSLA") is None
-    assert ONT.edge_error("OPERATES", "LAC", "facility:thacker-pass") is None
-    assert ONT.edge_error("CONSUMES", "TSLA", "material:lithium-hydroxide") is None
-    assert ONT.edge_error("PRODUCES", "facility:mountain-pass", "material:ndpr") is None
-    assert "target must be" in ONT.edge_error("SUPPLIES", "TSLA", "material:lithium")
-    assert "source must be" in ONT.edge_error("LOCATED_IN", "TSLA", "region:US")
+    assert ONT.edge_error("OPERATES", "LAC", "Thacker Pass") is None
+    assert ONT.edge_error("CONSUMES", "TSLA", "Lithium hydroxide") is None
+    assert ONT.edge_error("PRODUCES", "Mountain Pass", "NdPr oxide") is None
+    assert "target must be" in ONT.edge_error("SUPPLIES", "TSLA", "Lithium")
+    assert "source must be" in ONT.edge_error("LOCATED_IN", "TSLA", "United States")
     assert ONT.edge_error("SUPPLIES", "TSLA", "TSLA") == "self-loop"
     assert "unknown target" in ONT.edge_error("SUPPLIES", "TSLA", "ACME")
     assert "unknown relation" in ONT.edge_error("LIKES", "TSLA", "GM")
 
 
 def test_hierarchy_and_lookup():
-    assert ONT.ancestors("material:lithium-hydroxide") == ["material:lithium"]
-    assert ONT.ancestors("region:US-NV") == ["region:US"]
-    assert ONT.lookup("material", "LiOH") == "material:lithium-hydroxide"
-    assert ONT.lookup("region", "Québec") == "region:CA-QC"
-    assert ONT.lookup("region", "DR Congo") == "region:CD"
+    assert ONT.ancestors("Lithium hydroxide") == ["Lithium"]
+    assert ONT.ancestors("Nevada") == ["United States"]
+    assert ONT.lookup("material", "LiOH") == "Lithium hydroxide"
+    assert ONT.lookup("region", "Québec") == "Quebec"
+    assert ONT.lookup("region", "DR Congo") == "DR Congo"
     assert ONT.lookup("company", "Contemporary Amperex") == "CATL"
     assert ONT.lookup("material", "unobtainium") is None
 
@@ -87,7 +87,7 @@ def test_relation_validation(overrides, message):
     [
         (
             {"material": {"nodes": [{"id": "a", "name": "A"}, {"id": "a", "name": "B"}]}},
-            "duplicate node material:a",
+            "duplicate material id 'a'",
         ),
         ({"material": {"nodes": [{"id": "b", "name": "B", "parent": "zzz"}]}}, "parent 'zzz'"),
         (
@@ -96,10 +96,10 @@ def test_relation_validation(overrides, message):
                     "nodes": [{"id": "a", "name": "Ore"}, {"id": "b", "name": "B", "aliases": ["ore"]}]
                 }
             },
-            "already used by material:a",
+            "already used by Ore",
         ),
         (
-            {"facility": {"nodes": [{"id": "f", "name": "F", "operators": ["NOPE"], "region": "US"}]}},
+            {"facility": {"nodes": [{"id": "f", "name": "Plant X", "operators": ["NOPE"], "region": "US"}]}},
             "operator 'NOPE'",
         ),
     ],
@@ -159,3 +159,18 @@ def test_supply_chain_relations_know_their_upstream_end():
     assert ONT.relations["SUBSIDIARY_OF"].upstream is None
     with pytest.raises(OntologyError, match="need upstream"):
         build_ontology(raw_relations(channel="supply_chain"), empty_nodes(), UNIVERSE)
+
+
+def test_node_labels_are_unique_across_kinds():
+    nodes = {
+        **empty_nodes(),
+        "facility": {"nodes": [{"id": "f", "name": "F", "operators": ["TSLA"], "region": "US"}]},
+    }
+    with pytest.raises(OntologyError, match="'F' is used by both a company and a facility"):
+        build_ontology(raw_relations(), nodes, UNIVERSE)
+
+
+def test_long_node_names_are_rejected():
+    nodes = {**empty_nodes(), "material": {"nodes": [{"id": "x", "name": "A very long material name here"}]}}
+    with pytest.raises(OntologyError, match="longer than 4 words"):
+        build_ontology(raw_relations(), nodes, UNIVERSE)

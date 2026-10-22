@@ -24,7 +24,7 @@ CACHE_DIR = settings.DATA_DIR / "explorer"
 CONFIG_FILES = ["relations.yaml", "universe.yaml", "nodes/materials.yaml", "nodes/components.yaml",
                 "nodes/regions.yaml", "nodes/authorities.yaml", "nodes/programs.yaml",
                 "nodes/facilities.yaml"]  # fmt: skip
-VERIFY_VERSION = "2"  # bump when verification code changes in a way config hashing cannot see
+VERIFY_VERSION = "3"  # bump when verification code changes in a way config hashing cannot see
 
 
 @dataclass(frozen=True)

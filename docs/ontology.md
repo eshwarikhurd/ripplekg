@@ -8,17 +8,19 @@ Edit those files, not this one.
 ## Nodes
 
 Every node must resolve to a universe company or a curated list entry. Unresolved names are kept
-for review and never become nodes.
+for review and never become nodes. A node is labelled by its ticker (companies) or its short
+canonical name of at most 4 words (everything else); its kind is a property,
+not part of the label. Labels are unique across all kinds.
 
-| Kind | Count | Reference form | Source |
+| Kind | Count | Label examples | Source |
 |---|---|---|---|
-| company | 68 | `TSLA` | [universe.yaml](../config/universe.yaml) |
-| material | 23 | `material:id` | [materials.yaml](../config/nodes/materials.yaml) |
-| component | 15 | `component:id` | [components.yaml](../config/nodes/components.yaml) |
-| region | 44 | `region:id` | [regions.yaml](../config/nodes/regions.yaml) |
-| authority | 19 | `authority:id` | [authorities.yaml](../config/nodes/authorities.yaml) |
-| program | 8 | `program:id` | [programs.yaml](../config/nodes/programs.yaml) |
-| facility | 15 | `facility:id` | [facilities.yaml](../config/nodes/facilities.yaml) |
+| company | 68 | `TSLA`, `CATL` | [universe.yaml](../config/universe.yaml) |
+| material | 23 | `Lithium hydroxide` | [materials.yaml](../config/nodes/materials.yaml) |
+| component | 15 | `Battery cells` | [components.yaml](../config/nodes/components.yaml) |
+| region | 44 | `China`, `Nevada` | [regions.yaml](../config/nodes/regions.yaml) |
+| authority | 19 | `USTR` | [authorities.yaml](../config/nodes/authorities.yaml) |
+| program | 8 | `IRA 45X credit` | [programs.yaml](../config/nodes/programs.yaml) |
+| facility | 15 | `Thacker Pass` | [facilities.yaml](../config/nodes/facilities.yaml) |
 
 ## Edge properties
 
@@ -130,19 +132,19 @@ Fictional companies. Each quote is checked to be a complete sentence copied verb
 
 > Sales to Borealis Motors, which purchases battery cells from us for its electric pickup trucks, accounted for 41% of our revenue in 2023.
 
-- `Northwind Cells` —SUPPLIES→ `Borealis Motors`, active [component=battery-cell, strength=0.41 (revenue_share)]
+- `Northwind Cells` —SUPPLIES→ `Borealis Motors`, active [component=Battery cells, strength=0.41 (revenue_share)]
 
 **CUSTOMER_OF** (filer: Northwind Cells)
 
 > We purchase substantially all of our cathode active material from Halcyon Materials under a supply agreement that runs through 2027.
 
-- `Halcyon Materials` —SUPPLIES→ `Northwind Cells`, active [component=cathode-active-material]
+- `Halcyon Materials` —SUPPLIES→ `Northwind Cells`, active [component=Cathode active material]
 
 **OFFTAKE** (filer: Acme Lithium)
 
 > In March 2022 we entered into a binding offtake agreement with Borealis Motors for 60% of Phase 1 lithium hydroxide production from the Ridgeway project for ten years.
 
-- `Acme Lithium` —OFFTAKE→ `Borealis Motors`, active [material=lithium-hydroxide, strength=0.6 (output_share)]
+- `Acme Lithium` —OFFTAKE→ `Borealis Motors`, active [material=Lithium hydroxide, strength=0.6 (output_share)]
 
 **OFFTAKE** (filer: Acme Lithium)
 
@@ -154,13 +156,13 @@ Fictional companies. Each quote is checked to be a complete sentence copied verb
 
 > Under a tolling arrangement, Delta Refining converts our spodumene concentrate into battery-grade lithium carbonate, which we then sell to customers.
 
-- `Delta Refining` —TOLL_PROCESSES→ `Acme Lithium`, active [material=spodumene]
+- `Delta Refining` —TOLL_PROCESSES→ `Acme Lithium`, active [material=Spodumene]
 
 **SOLE_SOURCES_FROM** (filer: Northwind Cells)
 
 > We currently rely on a single supplier, Ion Separators Ltd., for the separator film used in all of our cells, and a disruption at its plant would halt our production.
 
-- `Northwind Cells` —SOLE_SOURCES_FROM→ `Ion Separators Ltd.`, active [component=separator, strength basis=sole_source]
+- `Northwind Cells` —SOLE_SOURCES_FROM→ `Ion Separators Ltd.`, active [component=Separator, strength basis=sole_source]
 
 **SOLE_SOURCES_FROM** (filer: Borealis Motors)
 
@@ -172,13 +174,13 @@ Fictional companies. Each quote is checked to be a complete sentence copied verb
 
 > We license our lithium iron phosphate cell technology to Borealis Motors for use at its Michigan battery plant in exchange for royalties.
 
-- `Northwind Cells` —LICENSES_TECHNOLOGY_TO→ `Borealis Motors`, active [component=battery-cell]
+- `Northwind Cells` —LICENSES_TECHNOLOGY_TO→ `Borealis Motors`, active [component=Battery cells]
 
 **DISTRIBUTES_FOR** (filer: Gridline Storage)
 
 > We integrate battery modules manufactured by Northwind Cells into the energy storage systems we sell to utilities.
 
-- `Gridline Storage` —DISTRIBUTES_FOR→ `Northwind Cells`, active [component=battery-module]
+- `Gridline Storage` —DISTRIBUTES_FOR→ `Northwind Cells`, active [component=Battery modules]
 
 **SUBSIDIARY_OF** (filer: Acme Lithium)
 
@@ -203,7 +205,7 @@ Fictional companies. Each quote is checked to be a complete sentence copied verb
 
 > Borealis Motors made a $200 million prepayment to us, to be credited against future deliveries of lithium carbonate.
 
-- `Borealis Motors` —FINANCES_SUPPLY→ `Acme Lithium`, active [material=lithium-carbonate]
+- `Borealis Motors` —FINANCES_SUPPLY→ `Acme Lithium`, active [material=Lithium carbonate]
 
 **ACQUIRES** (filer: Acme Lithium)
 
@@ -316,4 +318,4 @@ Fictional companies. Each quote is checked to be a complete sentence copied verb
 
 > Our supply agreement with Borealis Motors was terminated in the fourth quarter, and we no longer sell cells to Borealis.
 
-- `Northwind Cells` —SUPPLIES→ `Borealis Motors`, ceased [component=battery-cell]
+- `Northwind Cells` —SUPPLIES→ `Borealis Motors`, ceased [component=Battery cells]

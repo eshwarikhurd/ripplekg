@@ -2,16 +2,16 @@
 nodes:
   - {id: CN-MOFCOM, name: China Ministry of Commerce, region: CN, aliases: [MOFCOM, Ministry of Commerce of the PRC]}
   - {id: CN-GOV, name: Government of China, region: CN, aliases: [Chinese government, PRC government]}
-  - {id: US-USTR, name: Office of the US Trade Representative, region: US, aliases: [USTR]}
+  - {id: US-USTR, name: USTR, region: US, aliases: [Office of the US Trade Representative]}
   - {id: US-COMMERCE, name: US Department of Commerce, region: US, aliases: [Department of Commerce, Bureau of Industry and Security, BIS]}
   - {id: US-DOE, name: US Department of Energy, region: US, aliases: [Department of Energy, DOE]}
-  - {id: US-TREASURY, name: US Department of the Treasury, region: US, aliases: [Treasury, IRS, Internal Revenue Service]}
+  - {id: US-TREASURY, name: US Treasury, region: US, aliases: [US Department of the Treasury, Treasury, IRS, Internal Revenue Service]}
   - {id: US-DOD, name: US Department of Defense, region: US, aliases: [Department of Defense, DoD, Pentagon]}
-  - {id: US-NHTSA, name: National Highway Traffic Safety Administration, region: US, aliases: [NHTSA]}
+  - {id: US-NHTSA, name: NHTSA, region: US, aliases: [National Highway Traffic Safety Administration]}
   - {id: US-BLM, name: Bureau of Land Management, region: US, aliases: [BLM]}
   - {id: US-EPA, name: US Environmental Protection Agency, region: US, aliases: [EPA]}
-  - {id: US-DHS, name: US Department of Homeland Security, region: US, aliases: [DHS, ICE, Immigration and Customs Enforcement]}
-  - {id: US-CBP, name: US Customs and Border Protection, region: US, aliases: [CBP, Customs and Border Protection]}
+  - {id: US-DHS, name: DHS, region: US, aliases: [US Department of Homeland Security, ICE, Immigration and Customs Enforcement]}
+  - {id: US-CBP, name: CBP, region: US, aliases: [US Customs and Border Protection, Customs and Border Protection]}
   - {id: CL-GOV, name: Government of Chile, region: CL, aliases: [Chilean government, CORFO, Codelco]}
   - {id: CD-ARECOMS, name: DRC strategic minerals regulator, region: CD, aliases: [ARECOMS]}
   - {id: ZW-MINES, name: Zimbabwe Ministry of Mines, region: ZW, aliases: [Ministry of Mines and Mining Development]}

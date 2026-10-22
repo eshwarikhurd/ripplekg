@@ -29,7 +29,7 @@ def test_every_family_prompt_has_its_relations_and_examples():
         assert "Output:" in p.system
     trade = build_prompt(ONT, "trade", EXAMPLES).system
     assert '"relation": "CUSTOMER_OF"' in trade  # alias example shown as written
-    assert "lithium-hydroxide" in trade  # material ids listed for attribute fields
+    assert "Lithium hydroxide" in trade  # material names listed for attribute fields
 
 
 class FakeMessages:
@@ -106,8 +106,8 @@ def test_strength_must_be_backed_by_quote():
 def test_resolver_handles_legal_suffixes_and_kinds():
     assert RESOLVER.resolve("Albemarle Corporation", {"company"}) == "ALB"
     assert RESOLVER.resolve("Panasonic Holdings Corp.", {"company"}) == "PANASONIC"
-    assert RESOLVER.resolve("lithium hydroxide", {"material", "component"}) == "material:lithium-hydroxide"
-    assert RESOLVER.resolve("Nevada", {"region"}) == "region:US-NV"
+    assert RESOLVER.resolve("lithium hydroxide", {"material", "component"}) == "Lithium hydroxide"
+    assert RESOLVER.resolve("Nevada", {"region"}) == "Nevada"
     assert RESOLVER.resolve("our suppliers", {"company"}) is None
     assert RESOLVER.resolve("Albemarle (ALB)", {"company"}) == "ALB"
     assert RESOLVER.resolve("POSCO Holdings (PKX)", {"company"}) == "PKX"

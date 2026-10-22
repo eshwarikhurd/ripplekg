@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from ripplekg.extraction.llm import LLMProvider, LLMResult, ResponseCache, cached_complete
 from ripplekg.ontology.schema import Example, Ontology
 
-PROMPT_VERSION = "v2"
+PROMPT_VERSION = "v2.1"  # v2.1: attribute lists use node names instead of config ids
 MAX_ENDPOINT_WORDS = 4
 
 FAMILY_TITLES = {
@@ -123,10 +123,10 @@ def build_prompt(ont: Ontology, family: str, examples: list[Example]) -> FamilyP
     attrs = sorted({a for r in rels for a in r.attributes})
     attr_text = ""
     if "material" in attrs or "component" in attrs:
-        mats = ", ".join(n.id for n in ont.nodes.values() if n.kind == "material")
-        comps = ", ".join(n.id for n in ont.nodes.values() if n.kind == "component")
+        mats = "; ".join(n.name for n in ont.nodes.values() if n.kind == "material")
+        comps = "; ".join(n.name for n in ont.nodes.values() if n.kind == "component")
         attr_text = (
-            '\nmaterial / component: what flows along the edge, as one of these ids, or "" if none fits.\n'
+            '\nmaterial / component: what flows along the edge, as one of these names, or "" if none fits.\n'
             f"Materials: {mats}\nComponents: {comps}\n"
         )
     if "hazard" in attrs:

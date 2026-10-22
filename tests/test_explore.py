@@ -40,7 +40,7 @@ TRIPLES = pd.DataFrame(
             date="2025-01-30T21:00:00+00:00",
             raw_src="Panasonic Holdings",
         ),
-        t("TSLA", "CONSUMES", "material:lithium"),
+        t("TSLA", "CONSUMES", "Lithium"),
         t("Acme Widgets", "SUPPLIES", "TSLA", ok=False, reason="unresolved source"),
         t("Acme Widgets", "SUPPLIES", "GM", ok=False, reason="unresolved source"),
     ]
@@ -83,8 +83,8 @@ def test_review_store_keeps_history_and_latest_wins(tmp_path):
 
 def test_network_neighbourhood_and_html():
     edges = aggregate_edges(TRIPLES)
-    assert set(neighbourhood(edges, "material:lithium", 1)["source_ref"]) == {"TSLA"}
-    assert len(neighbourhood(edges, "material:lithium", 2)) == 2
+    assert set(neighbourhood(edges, "Lithium", 1)["source_ref"]) == {"TSLA"}
+    assert len(neighbourhood(edges, "Lithium", 2)) == 2
     html = network_html(edges, ONT, focus="TSLA")
     assert "PANASONIC" in html and "new vis.Network" in html
     loads = re.findall(r'(?:src|href)="([^"]+)"', html)

@@ -3,9 +3,9 @@ from datetime import date
 import pytest
 
 from ripplekg.evaluation.events import DEV_COUNTS, EventsError, assign_split, load_events, parse_events
-from ripplekg.ontology.universe import load_universe
+from ripplekg.ontology.schema import load_ontology
 
-UNIVERSE = load_universe()
+ONT = load_ontology()
 
 
 def ev(**kw):
@@ -28,7 +28,7 @@ def ev(**kw):
 
 
 def parse(*rows):
-    return parse_events({"events": list(rows)}, UNIVERSE)
+    return parse_events({"events": list(rows)}, ONT)
 
 
 def test_project_events_are_valid_and_split_matches_preregistration():
@@ -42,7 +42,7 @@ def test_project_events_are_valid_and_split_matches_preregistration():
 
 def test_project_events_never_score_their_origin_companies():
     for e in load_events():
-        companies = [o for o in e.origin if ":" not in o]
+        companies = [o for o, k in zip(e.origin, e.origin_kinds, strict=True) if k == "company"]
         assert set(companies) <= set(e.named), e.id
 
 
@@ -53,7 +53,7 @@ def test_split_is_deterministic_and_seed_dependent():
 
 
 def test_parses_dates_and_origin_kind():
-    (e,) = parse(ev(origin=["TSLA", "material:lithium"]))
+    (e,) = parse(ev(origin=["TSLA", "Lithium"]))
     assert e.day0 == date(2024, 3, 5)
     assert e.origin_kind == "non_company"
     assert parse(ev())[0].origin_kind == "company"
@@ -62,8 +62,8 @@ def test_parses_dates_and_origin_kind():
 @pytest.mark.parametrize(
     ("row", "message"),
     [
-        (ev(origin=["NOPE"]), "origin company 'NOPE' is not in the universe"),
-        (ev(origin=["planet:mars"]), "unknown kind 'planet'"),
+        (ev(origin=["NOPE"]), "origin 'NOPE' is not a node in the ontology"),
+        (ev(named=["Lithium"]), "named company 'Lithium' is not in the universe"),
         (ev(named=["NOPE"]), "named company 'NOPE'"),
         (ev(day0="2024-03-09"), "is a weekend"),
         (ev(day0="2024-03-04"), "before announced"),

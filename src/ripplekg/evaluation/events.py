@@ -1,8 +1,7 @@
 """Benchmark events: loads, validates and splits config/events.yaml.
 
-An event origin is a list of node references. A bare id ("TSLA") refers to a
-company in the universe; any other node uses a "kind:id" prefix
-("material:lithium", "region:CL", "authority:CN-MOFCOM", "program:US-IRA").
+An event origin is a list of node labels from the ontology: a company ticker or ID ("TSLA",
+"CATL") or the short name of a curated node ("Lithium", "Chile", "China Ministry of Commerce").
 """
 
 from __future__ import annotations
@@ -15,10 +14,9 @@ from pathlib import Path
 
 import yaml
 
-from ripplekg.ontology.universe import Universe, load_universe
+from ripplekg.ontology.schema import Ontology, load_ontology
 from ripplekg.settings import CONFIG_DIR
 
-NODE_KINDS = {"company", "facility", "material", "component", "region", "authority", "program"}
 SHOCK_TYPES = {"supply_shock", "demand_shock", "mixed"}
 BUCKETS = {"primary", "macro"}
 SIGNS = {"negative", "positive", "mixed"}
@@ -63,11 +61,12 @@ class Event:
     sources: tuple[str, ...]
     split: str | None
     notes: str = ""
+    origin_kinds: tuple[str, ...] = ()  # node kind of each origin, from the ontology
 
     @property
     def origin_kind(self) -> str:
         """'company' if every origin node is a company, otherwise 'non_company'."""
-        return "company" if all(":" not in o for o in self.origin) else "non_company"
+        return "company" if all(k == "company" for k in self.origin_kinds) else "non_company"
 
 
 class EventsError(ValueError):
@@ -84,7 +83,7 @@ def _as_date(value, field: str, eid: str, errors: list[str]) -> date | None:
         return None
 
 
-def parse_events(raw: dict, universe: Universe) -> list[Event]:
+def parse_events(raw: dict, ont: Ontology) -> list[Event]:
     events: list[Event] = []
     errors: list[str] = []
     for row in raw.get("events", []):
@@ -106,6 +105,7 @@ def parse_events(raw: dict, universe: Universe) -> list[Event]:
                 sources=tuple(row["sources"]),
                 split=row.get("split"),
                 notes=row.get("notes", ""),
+                origin_kinds=tuple(ont.nodes[o].kind if o in ont.nodes else "?" for o in row["origin"]),
             )
         except KeyError as exc:
             errors.append(f"{eid}: missing field {exc}")
@@ -124,14 +124,10 @@ def parse_events(raw: dict, universe: Universe) -> list[Event]:
         if not e.origin:
             errors.append(f"{e.id}: origin is empty")
         for node in e.origin:
-            if ":" in node:
-                kind = node.split(":", 1)[0]
-                if kind not in NODE_KINDS:
-                    errors.append(f"{e.id}: origin {node!r} has unknown kind {kind!r}")
-            elif node not in universe.by_id:
-                errors.append(f"{e.id}: origin company {node!r} is not in the universe")
+            if node not in ont.nodes:
+                errors.append(f"{e.id}: origin {node!r} is not a node in the ontology")
         for c in e.named:
-            if c not in universe.by_id:
+            if c not in ont.nodes or ont.nodes[c].kind != "company":
                 errors.append(f"{e.id}: named company {c!r} is not in the universe")
         if not e.sources or not all(s.startswith("https://") for s in e.sources):
             errors.append(f"{e.id}: needs at least one https source")
@@ -180,6 +176,6 @@ def assign_split(events: list[Event], seed: int = SPLIT_SEED) -> dict[str, str]:
     return split
 
 
-def load_events(path: Path = CONFIG_DIR / "events.yaml", universe: Universe | None = None) -> list[Event]:
+def load_events(path: Path = CONFIG_DIR / "events.yaml", ont: Ontology | None = None) -> list[Event]:
     with path.open() as f:
-        return parse_events(yaml.safe_load(f), universe or load_universe())
+        return parse_events(yaml.safe_load(f), ont or load_ontology())

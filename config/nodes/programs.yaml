@@ -1,10 +1,10 @@
 # Government programs that companies receive incentives from or depend on.
 nodes:
   - {id: US-IRA, name: Inflation Reduction Act, authority: US-TREASURY, aliases: [IRA]}
-  - {id: US-IRA-30D, name: Clean vehicle credit (IRC 30D), parent: US-IRA, authority: US-TREASURY, aliases: [30D, clean vehicle credit, EV tax credit]}
-  - {id: US-IRA-45X, name: Advanced manufacturing production credit (IRC 45X), parent: US-IRA, authority: US-TREASURY, aliases: [45X, advanced manufacturing production credit]}
-  - {id: US-IRA-48C, name: Qualifying advanced energy project credit (IRC 48C), parent: US-IRA, authority: US-TREASURY, aliases: [48C]}
+  - {id: US-IRA-30D, name: IRA 30D credit, parent: US-IRA, authority: US-TREASURY, aliases: [Clean vehicle credit (IRC 30D), 30D, clean vehicle credit, EV tax credit]}
+  - {id: US-IRA-45X, name: IRA 45X credit, parent: US-IRA, authority: US-TREASURY, aliases: [Advanced manufacturing production credit (IRC 45X), 45X, advanced manufacturing production credit]}
+  - {id: US-IRA-48C, name: IRA 48C credit, parent: US-IRA, authority: US-TREASURY, aliases: [Qualifying advanced energy project credit (IRC 48C), 48C]}
   - {id: US-DOE-LPO, name: DOE Loan Programs Office, authority: US-DOE, aliases: [LPO, ATVM, Advanced Technology Vehicles Manufacturing loan]}
-  - {id: US-BIL-BATTERY, name: Bipartisan Infrastructure Law battery manufacturing grants, authority: US-DOE, aliases: [Battery Materials Processing and Battery Manufacturing grants, MESC grants]}
-  - {id: US-DPA-TITLE3, name: Defense Production Act Title III, authority: US-DOD, aliases: [DPA Title III, Defense Production Act]}
-  - {id: EU-CRMA, name: EU Critical Raw Materials Act, authority: EU-COMMISSION, aliases: [Critical Raw Materials Act, CRMA]}
+  - {id: US-BIL-BATTERY, name: BIL battery grants, authority: US-DOE, aliases: [Bipartisan Infrastructure Law battery manufacturing grants, Battery Materials Processing and Battery Manufacturing grants, MESC grants]}
+  - {id: US-DPA-TITLE3, name: DPA Title III, authority: US-DOD, aliases: [Defense Production Act Title III, Defense Production Act]}
+  - {id: EU-CRMA, name: EU CRMA, authority: EU-COMMISSION, aliases: [EU Critical Raw Materials Act, Critical Raw Materials Act, CRMA]}

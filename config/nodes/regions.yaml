@@ -7,7 +7,7 @@ nodes:
   - {id: BO, name: Bolivia, aliases: []}
   - {id: AU, name: Australia, aliases: []}
   - {id: CA, name: Canada, aliases: []}
-  - {id: CD, name: Democratic Republic of the Congo, aliases: [DRC, DR Congo, Congo (Kinshasa)]}
+  - {id: CD, name: DR Congo, aliases: [Democratic Republic of the Congo, DRC, Congo (Kinshasa)]}
   - {id: ZW, name: Zimbabwe, aliases: []}
   - {id: ID, name: Indonesia, aliases: []}
   - {id: PH, name: Philippines, aliases: []}

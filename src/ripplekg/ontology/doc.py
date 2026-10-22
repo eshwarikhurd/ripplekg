@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ripplekg.ontology.schema import NODE_FILES, PRIORS, Example, Ontology
+from ripplekg.ontology.schema import MAX_NODE_WORDS, NODE_FILES, PRIORS, Example, Ontology
 
 FAMILY_TITLES = {
     "trade": "A. Trade links",
@@ -50,21 +50,30 @@ def render(ont: Ontology, examples: list[Example]) -> str:
         "## Nodes",
         "",
         "Every node must resolve to a universe company or a curated list entry. Unresolved names are kept",
-        "for review and never become nodes.",
+        "for review and never become nodes. A node is labelled by its ticker (companies) or its short",
+        f"canonical name of at most {MAX_NODE_WORDS} words (everything else); its kind is a property,",
+        "not part of the label. Labels are unique across all kinds.",
         "",
-        "| Kind | Count | Reference form | Source |",
+        "| Kind | Count | Label examples | Source |",
         "|---|---|---|---|",
     ]
     counts = {}
     for n in ont.nodes.values():
         counts[n.kind] = counts.get(n.kind, 0) + 1
-    out.append(
-        f"| company | {counts.get('company', 0)} | `TSLA` | [universe.yaml](../config/universe.yaml) |"
-    )
+    label_examples = {
+        "company": "`TSLA`, `CATL`",
+        "material": "`Lithium hydroxide`",
+        "component": "`Battery cells`",
+        "region": "`China`, `Nevada`",
+        "authority": "`USTR`",
+        "program": "`IRA 45X credit`",
+        "facility": "`Thacker Pass`",
+    }
+    universe_link = "[universe.yaml](../config/universe.yaml)"
+    out.append(f"| company | {counts.get('company', 0)} | {label_examples['company']} | {universe_link} |")
     for kind, filename in NODE_FILES.items():
-        out.append(
-            f"| {kind} | {counts.get(kind, 0)} | `{kind}:id` | [{filename}](../config/nodes/{filename}) |"
-        )
+        link = f"[{filename}](../config/nodes/{filename})"
+        out.append(f"| {kind} | {counts.get(kind, 0)} | {label_examples[kind]} | {link} |")
 
     out += [
         "",

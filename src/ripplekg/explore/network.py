@@ -42,7 +42,7 @@ def network_html(edges: pd.DataFrame, ont: Ontology, focus: str | None = None, h
     for node in nodes:
         n = ont.nodes.get(node)
         kind = n.kind if n else "company"
-        label = node.split(":", 1)[-1]
+        label = node
         title = f"{n.name if n else node} ({kind}) · {int(degree.get(node, 0))} edges"
         net.add_node(
             node,
