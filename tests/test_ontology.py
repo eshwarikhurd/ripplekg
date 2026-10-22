@@ -9,7 +9,7 @@ UNIVERSE = load_universe()
 
 
 def test_project_ontology_shape():
-    assert len(ONT.relations) == 23
+    assert len(ONT.relations) == 25
     families = {r.family for r in ONT.relations.values()}
     assert families == {"trade", "ownership_capital", "footprint", "competition", "exposure", "disputes"}
     assert ONT.canonical_relation("CUSTOMER_OF") == ("SUPPLIES", True)

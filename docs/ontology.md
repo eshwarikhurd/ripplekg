@@ -46,64 +46,85 @@ Supply-chain relations record which end is **upstream** (the supplier), whatever
 relation name reads in. A supply shock flows upstream → downstream; a demand shock flows
 downstream → upstream.
 
-23 canonical relations in 6 families. Extraction may also emit `CUSTOMER_OF` (stored as `SUPPLIES` reversed).
+25 canonical relations in 6 families. Extraction may also emit `CUSTOMER_OF` (stored as `SUPPLIES` reversed).
 
 ### A. Trade links
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `SUPPLIES` | company → company | supply chain (upstream = source) | normal | Source sells goods or materials to target. |
-| `OFFTAKE` | company → company | supply chain (upstream = source) | strong | Long-term agreement for target to buy source's mine or refinery output. |
-| `TOLL_PROCESSES` | company → company | supply chain (upstream = source) | normal | Source converts material that target owns (tolling or contract refining). |
-| `SOLE_SOURCES_FROM` | company → company | supply chain (upstream = target) | strong | Source states that target is its sole, single or limited supplier. |
-| `LICENSES_TECHNOLOGY_TO` | company → company | supply chain (upstream = source) | weak | Source licenses battery chemistry, cell design or process technology to target. |
-| `DISTRIBUTES_FOR` | company → company | supply chain (upstream = target) | weak | Source resells or integrates target's products (for example an energy-storage integrator). |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `SUPPLIES` | company → company | supply chain (upstream = source) | normal | Source sells goods or materials to target. | Use when the source sells or delivers goods, materials or components to the target. Not for long-term mine or refinery offtake (OFFTAKE) or an only/single-supplier statement (SOLE_SOURCES_FROM). |
+| `OFFTAKE` | company → company | supply chain (upstream = source) | strong | Long-term agreement for target to buy source's mine or refinery output. | Use for a binding offtake or long-term purchase agreement for a mine's or refinery's output. Not for ordinary product sales (SUPPLIES). |
+| `TOLL_PROCESSES` | company → company | supply chain (upstream = source) | normal | Source converts material that target owns (tolling or contract refining). | Use when the source processes or refines material that the target owns, for a fee. Not when the source buys the material (SUPPLIES). |
+| `SOLE_SOURCES_FROM` | company → company | supply chain (upstream = target) | strong | Source states that target is its sole, single or limited supplier. | Use when the source says the target is its only, single or one of few suppliers of something. Not for ordinary purchases (SUPPLIES with the ends swapped). |
+| `LICENSES_TECHNOLOGY_TO` | company → company | supply chain (upstream = source) | weak | Source licenses battery chemistry, cell design or process technology to target. | Use when the source licenses technology, chemistry or patents to the target. Not for selling products (SUPPLIES). |
+| `DISTRIBUTES_FOR` | company → company | supply chain (upstream = target) | weak | Source resells or integrates target's products (for example an energy-storage integrator). | Use when the source resells or integrates the target's products. Not when the source buys inputs for its own products (SUPPLIES with the ends swapped). |
 
 ### B. Ownership and capital
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `SUBSIDIARY_OF` | company → company | either kind of shock, either direction | strong | Source is a consolidated subsidiary of target. |
-| `INVESTS_IN` | company → company | either kind of shock, either direction | weak | Source holds a minority equity stake in target. |
-| `JV_PARTNER_IN` | company → facility | either kind of shock, either direction | normal | Source is a joint-venture partner in facility target. |
-| `FINANCES_SUPPLY` | company → company | supply chain (upstream = target) | normal | Source prepays, lends to or invests in target to secure future supply. |
-| `ACQUIRES` | company → company | dated event, not a standing channel | normal | Source acquires target. Closes target's edges from the closing date and moves them to source. |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `SUBSIDIARY_OF` | company → company | either kind of shock, either direction | strong | Source is a consolidated subsidiary of target. | Use when the source is majority-owned or controlled by the target. Not for a minority stake (INVESTS_IN). |
+| `INVESTS_IN` | company → company | either kind of shock, either direction | weak | Source holds a minority equity stake in target. | Use for a minority equity stake in a company. Not for majority ownership (SUBSIDIARY_OF), a completed takeover (ACQUIRES), or a prepayment for supply (FINANCES_SUPPLY). |
+| `JV_PARTNER_IN` | company → facility | either kind of shock, either direction | normal | Source is a joint-venture partner in facility target. | Use when the source co-owns a named joint-venture facility or project. Not when the source alone owns or runs it (OPERATES). |
+| `FINANCES_SUPPLY` | company → company | supply chain (upstream = target) | normal | Source prepays, lends to or invests in target to secure future supply. | Use for a prepayment, loan or investment made explicitly to secure future supply. Not for a purely financial stake (INVESTS_IN). |
+| `ACQUIRES` | company → company | dated event, not a standing channel | normal | Source acquires target. Closes target's edges from the closing date and moves them to source. | Use for a completed or agreed takeover of a company. Not for a minority investment (INVESTS_IN). |
 
 ### C. Physical footprint and materials
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `OPERATES` | company → facility | either kind of shock, either direction | strong | Source owns or operates facility target. |
-| `LOCATED_IN` | facility → region | hub: shock reaches linked companies, never bridges companies | strong | Facility source is located in region target. |
-| `PRODUCES` | company / facility → component / material | hub: shock reaches linked companies, never bridges companies | normal | Source produces material or component target. |
-| `CONSUMES` | company → component / material | hub: shock reaches linked companies, never bridges companies | normal | Source depends on material or component target as an input. |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `OPERATES` | company → facility | either kind of shock, either direction | strong | Source owns or operates facility target. | Use when the source owns or runs a specific, named facility, mine, plant or project. Not for a country or region (OPERATES_IN_REGION) or a co-owned joint venture (JV_PARTNER_IN). |
+| `LOCATED_IN` | facility → region | hub: shock reaches linked companies, never bridges companies | strong | Facility source is located in region target. | Use when a named facility is in a region. Not for a company's general presence in a region (OPERATES_IN_REGION). |
+| `PRODUCES` | company / facility → component / material | hub: shock reaches linked companies, never bridges companies | normal | Source produces material or component target. | Use when the source makes or extracts the material or component as output. Not for transporting, storing or reselling it. |
+| `CONSUMES` | company → component / material | hub: shock reaches linked companies, never bridges companies | normal | Source depends on material or component target as an input. | Use when the source uses the material or component as an input to production. Not for something it produces (PRODUCES). |
 
 ### D. Competition
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `COMPETES_WITH` (symmetric) | company → company | opposite sign (sign analysis only) | weak | Source names target as a competitor. |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `COMPETES_WITH` (symmetric) | company → company | opposite sign (sign analysis only) | weak | Source names target as a competitor. | Use when the text names the target as a competitor. Make one edge per named competitor. |
 
 ### E. External exposure
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `SOURCES_FROM_REGION` | company → region | hub: shock reaches linked companies, never bridges companies | normal | Source buys from or operates in region target to a stated or material degree. |
-| `SUBJECT_TO_TRADE_RESTRICTION` | company / component / material → authority / region | hub: shock reaches linked companies, never bridges companies | normal | Source is affected by an export control, tariff or foreign-entity rule imposed by target. |
-| `RECEIVES_INCENTIVE` | company → program | hub: shock reaches linked companies, never bridges companies | normal | Source receives or relies on a tax credit, grant or loan under program target. |
-| `REGULATED_BY` | company / facility → authority | hub: shock reaches linked companies, never bridges companies | weak | Source needs permits, licences or approvals from authority target. |
-| `EXPOSED_TO_CATASTROPHE` | company / facility → region | hub: shock reaches linked companies, never bridges companies | weak | Source states exposure to a natural hazard (earthquake, flood, drought, water rights) in region target. |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `SOURCES_FROM_REGION` | company → region | hub: shock reaches linked companies, never bridges companies | normal | Source buys inputs or raw materials from region target. | Use when the source buys inputs or raw materials from the region. Not for sales into the region (SELLS_TO_REGION) or operations there (OPERATES_IN_REGION). |
+| `SELLS_TO_REGION` | company → region | hub: shock reaches linked companies, never bridges companies | normal | Source earns revenue from customers in region target. | Use for sales, revenue or customers in the region. Not for buying inputs there (SOURCES_FROM_REGION). |
+| `OPERATES_IN_REGION` | company → region | hub: shock reaches linked companies, never bridges companies | weak | Source has operations, facilities or staff in region target, without a named facility. | Use when the text says the source operates in the region but names no specific facility. If a facility is named, use OPERATES and LOCATED_IN instead. |
+| `SUBJECT_TO_TRADE_RESTRICTION` | company / component / material → authority / region | hub: shock reaches linked companies, never bridges companies | normal | Source is affected by an export control, tariff or foreign-entity rule imposed by target. | Use when export controls, tariffs, sanctions or foreign-entity rules imposed by the target affect the source. |
+| `RECEIVES_INCENTIVE` | company → program | hub: shock reaches linked companies, never bridges companies | normal | Source receives or relies on a tax credit, grant or loan under program target. | Use when the source receives or expects a tax credit, grant or loan under a named program. |
+| `REGULATED_BY` | company / facility → authority | hub: shock reaches linked companies, never bridges companies | weak | Source needs permits, licences or approvals from authority target. | Use when the source needs permits, licences or approvals from a named authority. Not for general mentions of laws or regulation. |
+| `EXPOSED_TO_CATASTROPHE` | company / facility → region | hub: shock reaches linked companies, never bridges companies | weak | Source states exposure to a natural hazard (earthquake, flood, drought, water rights) in region target. | Use when the text names a natural hazard (flood, earthquake, drought, hurricane, water rights) affecting the source in the region. |
 
 ### F. Disputes
 
-| Relation | Source → target | Channel | Prior | Meaning |
-|---|---|---|---|---|
-| `IN_DISPUTE_WITH` (symmetric) | company → company | either kind of shock, either direction | weak | Litigation or arbitration between the two companies, often over a supply contract. |
-| `PENALIZED_BY` | company → authority | dated event, not a standing channel | normal | Source receives a fine, recall order or sanction from authority target. |
+| Relation | Source → target | Channel | Prior | Meaning | When to use it |
+|---|---|---|---|---|---|
+| `IN_DISPUTE_WITH` (symmetric) | company → company | either kind of shock, either direction | weak | Litigation or arbitration between the two companies, often over a supply contract. | Use for litigation or arbitration between the two named companies. |
+| `PENALIZED_BY` | company → authority | dated event, not a standing channel | normal | Source receives a fine, recall order or sanction from authority target. | Use when an authority fined, sanctioned or ordered a recall from the source. |
+
+## Deduplication
+
+- Within a chunk, an exact repeat of (source, relation, target) is kept once. Symmetric relations
+  are stored with their endpoints in sorted order, so A↔B and B↔A are the same edge.
+- Exclusive groups list near-synonymous relations, most specific first. For the same pair of nodes
+  supported by the same quote, only the first relation of a group that appears is kept:
+
+  - **ownership**: SUBSIDIARY_OF > ACQUIRES > INVESTS_IN
+  - **financing**: FINANCES_SUPPLY > INVESTS_IN
+  - **trade**: SOLE_SOURCES_FROM > OFFTAKE > TOLL_PROCESSES > SUPPLIES
+  - **facility_role**: JV_PARTNER_IN > OPERATES
+  - **region_link**: SUBJECT_TO_TRADE_RESTRICTION > EXPOSED_TO_CATASTROPHE > SOURCES_FROM_REGION > SELLS_TO_REGION > OPERATES_IN_REGION
+  - **material_role**: PRODUCES > CONSUMES
+
+- Across chunks and filings, repeated sightings of a fact are its evidence, not duplicates: the
+  graph builder merges them into one edge with a date range.
+- Companies are stored by ticker, other nodes by curated id, so name variants cannot create
+  duplicate nodes. Endpoints longer than 4 words are rejected.
 
 ## Examples
 
-Fictional companies. Each quote is checked to appear verbatim in its sentence.
+Fictional companies. Each quote is checked to be a complete sentence copied verbatim from the text.
 
 **SUPPLIES** (filer: Northwind Cells)
 
@@ -163,7 +184,7 @@ Fictional companies. Each quote is checked to appear verbatim in its sentence.
 
 > Acme Lithium Australia Pty Ltd is a wholly owned subsidiary of Acme Lithium.
 
-- `Acme Lithium Australia Pty Ltd` —SUBSIDIARY_OF→ `Acme Lithium`, active [strength=1.0 (ownership_share)]
+- `Acme Lithium Australia` —SUBSIDIARY_OF→ `Acme Lithium`, active [strength=1.0 (ownership_share)]
 
 **INVESTS_IN** (filer: Acme Lithium)
 
@@ -225,15 +246,35 @@ Fictional companies. Each quote is checked to appear verbatim in its sentence.
 
 **COMPETES_WITH** (filer: Polaris Battery)
 
-> Our principal competitors in battery cells include Northwind Cells and several large Asian manufacturers.
+> Our principal competitors in battery cells include Northwind Cells, Kestrel Energy and several large Asian manufacturers.
 
 - `Polaris Battery` —COMPETES_WITH→ `Northwind Cells`, active
+- `Polaris Battery` —COMPETES_WITH→ `Kestrel Energy`, active
 
 **SOURCES_FROM_REGION** (filer: Northwind Cells)
 
 > Approximately 70% of the graphite used in our anodes is sourced from China.
 
 - `Northwind Cells` —SOURCES_FROM_REGION→ `China`, active [strength=0.7 (purchase_share)]
+
+**SELLS_TO_REGION** (filer: Acme Lithium)
+
+> In 2024, net sales shipped to China represented 36% of our total net sales.
+
+- `Acme Lithium` —SELLS_TO_REGION→ `China`, active [strength=0.36 (revenue_share)]
+
+**OPERATES_IN_REGION** (filer: Acme Lithium)
+
+> We have mining and processing operations in Chile and Argentina.
+
+- `Acme Lithium` —OPERATES_IN_REGION→ `Chile`, active
+- `Acme Lithium` —OPERATES_IN_REGION→ `Argentina`, active
+
+**REGULATED_BY** (filer: Acme Lithium)
+
+> Our operations are subject to extensive environmental laws and regulations in the jurisdictions where we operate.
+
+- no edge: Generic laws and regulations, no named authority.
 
 **SUBJECT_TO_TRADE_RESTRICTION** (filer: Northwind Cells)
 
@@ -269,7 +310,7 @@ Fictional companies. Each quote is checked to appear verbatim in its sentence.
 
 > In June 2024 the National Highway Traffic Safety Administration ordered a recall of 12,000 vehicles equipped with our battery packs.
 
-- `Northwind Cells` —PENALIZED_BY→ `National Highway Traffic Safety Administration`, active
+- `Northwind Cells` —PENALIZED_BY→ `NHTSA`, active
 
 **SUPPLIES** (filer: Northwind Cells)
 

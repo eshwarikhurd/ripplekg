@@ -44,6 +44,7 @@ class Relation:
     attributes: frozenset[str] = frozenset()
     description: str = ""
     upstream: str | None = None  # supply_chain relations: which end supplies the other
+    guidance: str = ""  # when to use it, and when a neighbouring relation fits better
 
     @property
     def prior_weight(self) -> float:
@@ -82,6 +83,7 @@ class Ontology:
     relation_aliases: dict[str, tuple[str, bool]]  # label -> (canonical relation, reverse?)
     statuses: tuple[str, ...]
     strength_bases: dict[str, str]
+    exclusive_groups: dict[str, tuple[str, ...]]  # near-synonyms, most specific first
     nodes: dict[str, Node]  # ref -> node
     _names: dict[tuple[str, str], str] = field(default_factory=dict, repr=False)  # (kind, normalized) -> ref
 
@@ -120,6 +122,12 @@ class Ontology:
             return f"{relation} target must be {sorted(rel.target)}, got {tk}"
         return None
 
+    def canonical_endpoints(self, relation: str, source: str, target: str) -> tuple[str, str]:
+        """Symmetric relations are stored once, with endpoints in sorted order."""
+        if self.relations[relation].symmetric and target < source:
+            return target, source
+        return source, target
+
     def ancestors(self, ref: str) -> list[str]:
         """Parent chain of a node, nearest first."""
         out, node = [], self.node(ref)
@@ -146,6 +154,7 @@ def _relation(name: str, raw: dict) -> Relation:
         symmetric=bool(raw.get("symmetric", False)),
         attributes=frozenset(raw.get("attributes", [])),
         description=raw.get("description", ""),
+        guidance=raw.get("guidance", ""),
         upstream=raw.get("upstream"),
     )
 
@@ -181,6 +190,18 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
         if rel.symmetric and rel.source != rel.target:
             errors.append(f"relation {name}: symmetric relations need identical source and target kinds")
         relations[name] = rel
+
+    exclusive_groups: dict[str, tuple[str, ...]] = {}
+    for group, members in (relations_raw.get("exclusive_groups") or {}).items():
+        unknown = [m for m in members if m not in relations]
+        if unknown:
+            errors.append(f"exclusive group {group}: unknown relations {unknown}")
+        if len(set(members)) != len(members) or len(members) < 2:
+            errors.append(f"exclusive group {group}: needs at least two distinct relations")
+        exclusive_groups[group] = tuple(members)
+    for name, rel in relations.items():
+        if not rel.guidance:
+            errors.append(f"relation {name}: missing guidance")
 
     relation_aliases: dict[str, tuple[str, bool]] = {}
     for label, raw in relations_raw.get("aliases", {}).items():
@@ -240,6 +261,7 @@ def build_ontology(relations_raw: dict, nodes_raw: dict[str, dict], universe: Un
     return Ontology(
         relations=relations,
         relation_aliases=relation_aliases,
+        exclusive_groups=exclusive_groups,
         statuses=tuple(relations_raw.get("statuses", [])),
         strength_bases=strength_bases,
         nodes=nodes,
@@ -278,8 +300,14 @@ def load_examples(path: Path = CONFIG_DIR / "relation_examples.yaml") -> list[Ex
     ]
 
 
+MAX_ENDPOINT_WORDS = 4
+
+
 def example_errors(ont: Ontology, examples: list[Example]) -> list[str]:
-    """Checks that examples agree with the ontology and that every quote is verbatim."""
+    """Checks that examples agree with the ontology, every quote is a verbatim complete sentence,
+    and every endpoint is a short name."""
+    from ripplekg.extraction.verify import snap_to_sentences as _snap
+
     errors = []
     for i, ex in enumerate(examples):
         tag = f"example {i} ({ex.relation})"
@@ -296,6 +324,11 @@ def example_errors(ont: Ontology, examples: list[Example]) -> list[str]:
                 continue
             if edge.get("quote", "") not in ex.text:
                 errors.append(f"{tag}: quote is not verbatim in text: {edge.get('quote')!r}")
+            elif _snap(edge["quote"], ex.text) != " ".join(edge["quote"].split()):
+                errors.append(f"{tag}: quote is not a complete sentence: {edge.get('quote')!r}")
+            for end in ("source", "target"):
+                if len(str(edge.get(end, "")).split()) > MAX_ENDPOINT_WORDS:
+                    errors.append(f"{tag}: {end} longer than {MAX_ENDPOINT_WORDS} words: {edge.get(end)!r}")
             if edge.get("status") not in ont.statuses:
                 errors.append(f"{tag}: bad status {edge.get('status')!r}")
             basis = edge.get("strength_basis")

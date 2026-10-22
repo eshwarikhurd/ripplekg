@@ -13,8 +13,8 @@ from dataclasses import dataclass
 from ripplekg.extraction.llm import LLMProvider, LLMResult, ResponseCache, cached_complete
 from ripplekg.ontology.schema import Example, Ontology
 
-PROMPT_VERSION = "v1"
-MAX_QUOTE_WORDS = 40
+PROMPT_VERSION = "v2"
+MAX_ENDPOINT_WORDS = 4
 
 FAMILY_TITLES = {
     "trade": "trade links between companies",
@@ -114,7 +114,7 @@ def build_prompt(ont: Ontology, family: str, examples: list[Example]) -> FamilyP
     rel_lines = []
     for r in rels:
         kinds = f"{' or '.join(sorted(r.source))} → {' or '.join(sorted(r.target))}"
-        rel_lines.append(f"- {r.name} ({kinds}): {r.description}")
+        rel_lines.append(f"- {r.name} ({kinds}): {r.description} {r.guidance}")
     for alias, (rel, reverse) in ont.relation_aliases.items():
         if rel in {r.name for r in rels}:
             note = " with source and target swapped" if reverse else ""
@@ -131,6 +131,34 @@ def build_prompt(ont: Ontology, family: str, examples: list[Example]) -> FamilyP
         )
     if "hazard" in attrs:
         attr_text += 'hazard: the natural hazard named (for example "flood", "earthquake"), or "".\n'
+
+    # Directory of known nodes: companies by ticker, other kinds by their curated names.
+    endpoint_kinds = {k for r in rels for k in (*r.source, *r.target)}
+    companies = sorted((n.id, n.name) for n in ont.nodes.values() if n.kind == "company")
+    directory = "\n".join(f"{cid}: {name}" for cid, name in companies)
+    curated = []
+    for kind in ("facility", "material", "component", "region", "authority", "program"):
+        if kind in endpoint_kinds:
+            names = sorted(n.name for n in ont.nodes.values() if n.kind == kind)
+            curated.append(f"{kind.capitalize()}s: {'; '.join(names)}")
+    curated_text = (
+        ("\nKnown names for other entities (use them when they fit):\n" + "\n".join(curated))
+        if curated
+        else ""
+    )
+    groups = [
+        " > ".join(members)
+        for members in ont.exclusive_groups.values()
+        if any(m in {r.name for r in rels} for m in members)
+    ]
+    group_text = (
+        (
+            "\n- One relation per pair of entities per fact. When several of these could describe the same\n"
+            "  fact, use only the first that applies: " + "; ".join(groups) + "."
+        )
+        if groups
+        else ""
+    )
 
     family_examples = [
         ex for ex in examples if ont.canonical_relation(ex.relation)[0] in {r.name for r in rels}
@@ -149,17 +177,27 @@ Relationship types (source kind → target kind):
 
 Rules:
 - Only what the excerpt states. Never add facts from your own knowledge of these companies.
-- "We", "our", "us" and "the Company" refer to the filer: write the filer's name.
-- Name counterparties as written in the excerpt. Never output a group ("our suppliers", "certain
-  customers", "automakers") as a source or target.
-- quote: the shortest span from the excerpt that supports the relationship, at most {MAX_QUOTE_WORDS} words,
-  copied character for character. Do not paraphrase, shorten with "...", or join separate sentences.
+- "We", "our", "us" and "the Company" refer to the filer: write the filer's ticker.
+- Source and target are entity names, never descriptions or phrases:
+  - a company in the directory below: its ticker exactly (for example ALB, not "Albemarle Corporation");
+  - any other entity: its short common name, at most {MAX_ENDPOINT_WORDS} words, without legal suffixes
+    (Inc., Corp., Ltd.) or descriptions ("Meishan plant", not "lithium conversion plant in Meishan, China").
+- Never output a group ("our suppliers", "certain customers", "automakers") as a source or target.
+- A list of named entities gives one relationship per entity (three named competitors: three edges).
+- Each relationship appears once: do not repeat the same source, relation and target.{group_text}
+- quote: the complete sentence or sentences from the excerpt that state the relationship, copied
+  character for character. For a table, the complete row. Never a fragment, never paraphrased,
+  never shortened with "...". The quote must name the counterparty; the filer may appear as "we".
 - status:
 {STATUS_TEXT}
 - strength: only if the quote states a percentage or share for this specific relationship, as a
   fraction (23% → 0.23), with its strength_basis. Otherwise strength is null and strength_basis "none".
 {attr_text}
-Examples (fictional companies):
+Company directory (ticker: name):
+{directory}
+{curated_text}
+
+Examples (fictional companies, so they are written as short names):
 
 {shots}"""
     return FamilyPrompt(family=family, system=system, schema=build_schema(ont, family))
@@ -169,7 +207,7 @@ def user_message(
     filer_name: str, filer_id: str, form: str, published_at: str, section: str, text: str
 ) -> str:
     return (
-        f"Filer: {filer_name} ({filer_id})\n"
+        f"Filer: {filer_id} ({filer_name})\n"
         f"Document: {form} published {published_at[:10]}, section {section}\n"
         f"<excerpt>\n{text}\n</excerpt>"
     )
