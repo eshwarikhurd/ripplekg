@@ -1,4 +1,4 @@
-.PHONY: setup test lint format universe coverage
+.PHONY: setup test lint format universe coverage app
 
 setup:
 	uv sync
@@ -19,3 +19,6 @@ universe:
 
 coverage:
 	uv run ripplekg coverage
+
+app:
+	uv run streamlit run app/Home.py
